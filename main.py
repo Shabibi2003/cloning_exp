@@ -1385,15 +1385,7 @@ if st.session_state.script_choice == "login":
                 st.error("Invalid username or password")
     st.markdown("</div>", unsafe_allow_html=True)
 
-# Add CSS to reduce the size of charts in the monthly trends section
-st.markdown("""
-    <style>
-        .chart-container {
-            transform: scale(0.8); /* Reduce size to 80% */
-            transform-origin: top left; /* Anchor scaling to the top-left corner */
-        }
-    </style>
-""", unsafe_allow_html=True)
+
 
 # Wrap chart rendering in the monthly trends section with the new CSS class
 if st.session_state.script_choice == "monthly_trends":
@@ -1524,7 +1516,7 @@ if st.session_state.script_choice == "monthly_trends":
             if indoor_col not in combined_df.columns:
                 continue
 
-            fig, ax = plt.subplots(figsize=(2, 2))
+            fig, ax = plt.subplots(figsize=(10, 6))
 
             # Plot indoor data
             combined_df[indoor_col].plot(ax=ax, label=f"{pollutant_display_names[pollutant]} (Indoor)", color='blue')
@@ -1589,7 +1581,7 @@ if st.session_state.script_choice == "monthly_trends":
                     if week_row < 5:
                         calendar_data[week_row, week_col] = daily_avg
 
-            fig, ax = plt.subplots(figsize=(6, 4))
+            fig, ax = plt.subplots(figsize=(10, 6))
             color_list = ['#006400', '#228B22', '#FFFF00', '#FF7F00', '#FF0000', '#8B0000']
             cmap = ListedColormap(color_list)
             boundaries = feature_boundaries[feature]
@@ -1632,7 +1624,7 @@ if st.session_state.script_choice == "monthly_trends":
                 if data.empty:
                     continue
 
-                fig, ax = plt.subplots(figsize=(6, 4))
+                fig, ax = plt.subplots(figsize=(10, 6))
                 ax.scatter(data[pollutant + '_x'], data[pollutant + '_y'], color='purple', alpha=0.7)
                 ax.set_title(f"Hourly Avg: Indoor vs Outdoor - {pollutant.upper()}", fontsize=14)
                 ax.set_xlabel(f"{pollutant.upper()} (Indoor)", fontsize=12)
@@ -1657,7 +1649,7 @@ if st.session_state.script_choice == "monthly_trends":
         }
 
         yearly_df = indoor_df[(indoor_df.index.year == year) | ((indoor_df.index.year == year - 1) & (indoor_df.index.month == 12))]
-        fig, ax = plt.subplots(figsize=(6, 4))
+        fig, ax = plt.subplots(figsize=(10, 6))
         for season, months in seasons.items():
             seasonal_data = indoor_df[indoor_df.index.month.isin(months)]
             if not seasonal_data.empty:
