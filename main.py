@@ -1692,7 +1692,7 @@ if st.session_state.script_choice == "monthly_trends":
     st.markdown("""
         <style>
             .title {
-                font-size: 24px;
+                font-size: 18px;
                 text-align: left;
                 padding: 20px;
             }
@@ -1704,7 +1704,7 @@ if st.session_state.script_choice == "monthly_trends":
         </style>
     """, unsafe_allow_html=True)
 
-    st.markdown('<h1 class="title">Indoor & Outdoor Air Quality Trends</h1>', unsafe_allow_html=True)
+    st.markdown('<h3 class="title">Indoor & Outdoor Air Quality Trends</h3>', unsafe_allow_html=True)
     st.markdown("<br>", unsafe_allow_html=True)
 
     # Create columns for user inputs (deviceID, year, month)
@@ -1837,14 +1837,14 @@ if st.session_state.script_choice == "monthly_trends":
 
 
                     st.markdown("<br>", unsafe_allow_html=True)
-                    st.markdown("<h3 style='font-size:30px; text-align:center; font-weight:bold;'>Line Charts of Indoor & Outdoor</h3>", unsafe_allow_html=True)
+                    st.markdown("<h3 style='font-size:30px; text-align:left; font-weight:bold;'>Line Charts of Indoor & Outdoor</h3>", unsafe_allow_html=True)
                     st.markdown("<br>", unsafe_allow_html=True)
 
                     plot_and_display_line_charts(indoor_df, outdoor_df, pollutant_display_names, all_figs)
 
 
                     st.markdown("<br>", unsafe_allow_html=True)
-                    st.markdown("<h3 style='font-size:30px; text-align:center; font-weight:bold;'>Indoor vs Outdoor Scatter Plots</h3>", unsafe_allow_html=True)
+                    st.markdown("<h3 style='font-size:30px; text-align:left; font-weight:bold;'>Indoor vs Outdoor Scatter Plots</h3>", unsafe_allow_html=True)
                     st.markdown("<br>", unsafe_allow_html=True)
                     plot_indoor_vs_outdoor_scatter(indoor_df_hourly, outdoor_df_hourly, ['aqi', 'pm10', 'pm25'], all_figs)
 
@@ -1861,7 +1861,7 @@ if st.session_state.script_choice == "monthly_trends":
                     # Check if the device ID belongs to residential buildings
                     if device_id in residential_ids:
                         st.markdown("<br>", unsafe_allow_html=True)
-                        st.markdown("<h3 style='font-size:30px; text-align:center; font-weight:bold;'>Seasonal Line Chart for Residential Buildings</h3>", unsafe_allow_html=True)
+                        st.markdown("<h3 style='font-size:30px; text-align:left; font-weight:bold;'>Seasonal Line Chart for Residential Buildings</h3>", unsafe_allow_html=True)
                         st.markdown("<br>", unsafe_allow_html=True)
                         plot_residential_seasonal_line_chart(indoor_df_year, ['aqi', 'pm10', 'pm25'], year, all_figs)
                     else:
