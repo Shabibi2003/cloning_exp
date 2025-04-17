@@ -1524,7 +1524,7 @@ if st.session_state.script_choice == "monthly_trends":
             if indoor_col not in combined_df.columns:
                 continue
 
-            fig, ax = plt.subplots(figsize=(6, 4))
+            fig, ax = plt.subplots(figsize=(16, 12))
 
             # Plot indoor data
             combined_df[indoor_col].plot(ax=ax, label=f"{pollutant_display_names[pollutant]} (Indoor)", color='blue')
