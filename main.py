@@ -1597,7 +1597,7 @@ if st.session_state.script_choice == "monthly_trends":
                     if week_row < 5:
                         calendar_data[week_row, week_col] = daily_avg
 
-            fig, ax = plt.subplots(figsize=(10, 6))
+            fig, ax = plt.subplots(figsize=(6, 4))
             color_list = ['#006400', '#228B22', '#FFFF00', '#FF7F00', '#FF0000', '#8B0000']
             cmap = ListedColormap(color_list)
             boundaries = feature_boundaries[feature]
@@ -1624,7 +1624,7 @@ if st.session_state.script_choice == "monthly_trends":
             st.markdown("""
                 <style>
                     .chart-container {
-                        max-width: 500px;
+                        max-width: 400px;
                         margin: auto;
                     }
                 </style>
@@ -1649,7 +1649,7 @@ if st.session_state.script_choice == "monthly_trends":
                 if data.empty:
                     continue
 
-                fig, ax = plt.subplots(figsize=(8, 6))
+                fig, ax = plt.subplots(figsize=(6, 4))
                 ax.scatter(data[pollutant + '_x'], data[pollutant + '_y'], color='purple', alpha=0.7)
                 ax.set_title(f"Hourly Avg: Indoor vs Outdoor - {pollutant.upper()}", fontsize=14)
                 ax.set_xlabel(f"{pollutant.upper()} (Indoor)", fontsize=12)
@@ -1659,7 +1659,7 @@ if st.session_state.script_choice == "monthly_trends":
                 st.markdown("""
                     <style>
                         .chart-container {
-                            max-width: 500px;
+                            max-width: 400px;
                             margin: auto;
                         }
                     </style>
@@ -1682,7 +1682,7 @@ if st.session_state.script_choice == "monthly_trends":
         }
 
         yearly_df = indoor_df[(indoor_df.index.year == year) | ((indoor_df.index.year == year - 1) & (indoor_df.index.month == 12))]
-        fig, ax = plt.subplots(figsize=(10, 6))
+        fig, ax = plt.subplots(figsize=(6, 4))
         for season, months in seasons.items():
             seasonal_data = indoor_df[indoor_df.index.month.isin(months)]
             if not seasonal_data.empty:
@@ -1702,7 +1702,7 @@ if st.session_state.script_choice == "monthly_trends":
         st.markdown("""
                 <style>
                     .chart-container {
-                        max-width: 500px;
+                        max-width: 400px;
                         margin: auto;
                     }
                 </style>
