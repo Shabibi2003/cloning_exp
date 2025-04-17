@@ -1607,7 +1607,7 @@ if st.session_state.script_choice == "monthly_trends":
             cbar.set_ticklabels(labels)
             cbar.ax.tick_params(labelsize=12)
     
-            st.pyplot(fig)
+            st.pyplot(fig, use_container_width=False)
             all_figs[f"{feature}_heatmap"] = fig
     
     def plot_indoor_vs_outdoor_scatter(indoor_df, outdoor_df, pollutants, all_figs):
@@ -1627,7 +1627,7 @@ if st.session_state.script_choice == "monthly_trends":
                 ax.set_xlabel(f"{pollutant.upper()} (Indoor)", fontsize=12)
                 ax.set_ylabel(f"{pollutant.upper()} (Outdoor)", fontsize=12)
                 ax.grid(True)
-                st.pyplot(fig)
+                st.pyplot(fig, use_container_width=False)
                 all_figs[f"{pollutant}_hourly_scatter_plot"] = fig
     
     # Function to plot yearly data for residential buildings divided into seasons
@@ -1655,7 +1655,7 @@ if st.session_state.script_choice == "monthly_trends":
         ax.legend(title="Season")
         ax.grid(True)
         ax.set_xlim(indoor_df.index.min(), indoor_df.index.max())
-        st.pyplot(fig)
+        st.pyplot(fig, use_container_width=False)
         all_figs[f"{pollutant}_seasonal_chart_{year}"] = fig
     
     
