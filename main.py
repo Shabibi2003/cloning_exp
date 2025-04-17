@@ -1682,8 +1682,8 @@ if st.session_state.script_choice == "monthly_trends":
                 text-align: left;
                 padding: 20px;
             }
-            .red-line {
-                border-top: 3px solid red;
+            .black-line {
+                border-top: 3px solid black;
                 margin-top: 30px;
                 margin-bottom: 30px;
             }
@@ -1711,7 +1711,7 @@ if st.session_state.script_choice == "monthly_trends":
         month_name = st.selectbox("Select Month:", list(month.keys()), index=0)
         selected_month = month[month_name]
 
-    st.markdown('<div class="red-line"></div>', unsafe_allow_html=True)
+    st.markdown('<div class="black-line"></div>', unsafe_allow_html=True)
 
     # Get the address and typology for the entered device ID
     device_info = device_data.get(device_id, ("Not Available", "Not Available"))
@@ -1720,7 +1720,7 @@ if st.session_state.script_choice == "monthly_trends":
     st.write(f"Address: {device_info[0]}")
     st.write(f"Typology: {device_info[1]}")
 
-    st.markdown('<div class="red-line"></div>', unsafe_allow_html=True)
+    st.markdown('<div class="black-line"></div>', unsafe_allow_html=True)
 
     # Button to generate line charts
     if st.button("Generate Charts"):
