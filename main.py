@@ -1720,10 +1720,8 @@ if st.session_state.script_choice == "monthly_trends":
         <style>
             .title {
                 font-size: 36px;
-                text-align: center;
+                text-align: left;
                 padding: 20px;
-                border-radius: 80px;
-                border-bottom: 4px solid red;  /* Red underline */
             }
             .red-line {
                 border-top: 3px solid red;
