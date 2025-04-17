@@ -1524,7 +1524,7 @@ if st.session_state.script_choice == "monthly_trends":
             if indoor_col not in combined_df.columns:
                 continue
 
-            fig, ax = plt.subplots(figsize=(10, 6))
+            fig, ax = plt.subplots(figsize=(6, 4))
 
             # Plot indoor data
             combined_df[indoor_col].plot(ax=ax, label=f"{pollutant_display_names[pollutant]} (Indoor)", color='blue')
@@ -1544,7 +1544,7 @@ if st.session_state.script_choice == "monthly_trends":
             st.markdown("""
                 <style>
                     .chart-container {
-                        max-width: 500px;
+                        max-width: 400px;
                         margin: auto;
                     }
                 </style>
@@ -1552,7 +1552,6 @@ if st.session_state.script_choice == "monthly_trends":
             """, unsafe_allow_html=True)
             
             st.pyplot(fig, clear_figure=True)
-            
             st.markdown("</div>", unsafe_allow_html=True)
 
             all_figs[f"{pollutant}_line_chart"] = fig
