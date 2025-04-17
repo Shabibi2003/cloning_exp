@@ -1503,7 +1503,7 @@ if st.session_state.script_choice == "monthly_trends":
 
     # Function to plot and display line charts for pollutants
     def plot_and_display_line_charts(indoor_df, outdoor_df, pollutant_display_names, all_figs):
-         thresholds = {
+        thresholds = {
         'aqi': 300,
         'pm25': 250,
         'pm10': 350,
@@ -1512,6 +1512,7 @@ if st.session_state.script_choice == "monthly_trends":
         'temp': 28,
         'humidity': 70
       }
+
         combined_df = pd.concat(
             [indoor_df.add_suffix('_indoor'), outdoor_df.add_suffix('_outdoor')],
             axis=1
@@ -1536,23 +1537,24 @@ if st.session_state.script_choice == "monthly_trends":
             if pollutant.lower() not in ['co2', 'voc'] and outdoor_col in combined_df.columns:
                 combined_df[outdoor_col].plot(ax=ax, label=f"{pollutant_display_names[pollutant]} (Outdoor)", color='orange')
 
+        # Add a horizontal red line for the threshold if it exists
             if pollutant in thresholds:
-            ax.axhline(y=thresholds[pollutant], color='red', linestyle='--', linewidth=1.5, label=f"Threshold ({thresholds[pollutant]})")
+                ax.axhline(y=thresholds[pollutant], color='red', linestyle='--', linewidth=1.5, label=f"Threshold ({thresholds[pollutant]})")
 
-            ax.set_title(f"{pollutant_display_names[pollutant]} - Indoor vs Outdoor", fontsize=14)
-            ax.set_xlabel("Date", fontsize=12)
-            ax.set_ylabel(pollutant_display_names[pollutant], fontsize=12)
-            ax.legend()
-            ax.grid(True)
+                ax.set_title(f"{pollutant_display_names[pollutant]} - Indoor vs Outdoor", fontsize=14)
+                ax.set_xlabel("Date", fontsize=12)
+                ax.set_ylabel(pollutant_display_names[pollutant], fontsize=12)
+                ax.legend()
+                ax.grid(True)
 
-            buf = io.BytesIO()
-            fig.savefig(buf, format="png", dpi=100, bbox_inches='tight')
-            buf.seek(0)
-            img = Image.open(buf)
-            img = img.resize((int(img.width * 0.7), int(img.height * 0.7)))  # Scale to 70%
-            
-            st.image(img)
-            all_figs[f"{pollutant}_line_chart"] = fig
+                buf = io.BytesIO()
+                fig.savefig(buf, format="png", dpi=100, bbox_inches='tight')
+                buf.seek(0)
+                img = Image.open(buf)
+                img = img.resize((int(img.width * 0.7), int(img.height * 0.7)))  # Scale to 70%
+                
+                st.image(img)
+                all_figs[f"{pollutant}_line_chart"] = fig
 
     # Function to plot and display heatmaps for each feature (pollutant)
     def plot_and_display_feature_heatmaps(indoor_df, features, year, month, all_figs):
