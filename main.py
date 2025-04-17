@@ -1541,19 +1541,13 @@ if st.session_state.script_choice == "monthly_trends":
             ax.legend()
             ax.grid(True)
 
-            st.markdown("""
-                <style>
-                    .chart-container {
-                        max-width: 400px;
-                        margin: auto;
-                    }
-                </style>
-                <div class='chart-container'>
-            """, unsafe_allow_html=True)
+            buf = io.BytesIO()
+            fig.savefig(buf, format="png", dpi=100, bbox_inches='tight')
+            buf.seek(0)
+            img = Image.open(buf)
+            img = img.resize((int(img.width * 0.7), int(img.height * 0.7)))  # Scale to 70%
             
-            st.pyplot(fig, clear_figure=True)
-            st.markdown("</div>", unsafe_allow_html=True)
-
+            st.image(img)
             all_figs[f"{pollutant}_line_chart"] = fig
 
 
@@ -1620,23 +1614,14 @@ if st.session_state.script_choice == "monthly_trends":
             cbar.set_ticklabels(labels)
             cbar.ax.tick_params(labelsize=12)
 
-            st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-            st.markdown("""
-                <style>
-                    .chart-container {
-                        max-width: 400px;
-                        margin: auto;
-                    }
-                </style>
-                <div class='chart-container'>
-            """, unsafe_allow_html=True)
+            buf = io.BytesIO()
+            fig.savefig(buf, format="png", dpi=100, bbox_inches='tight')
+            buf.seek(0)
+            img = Image.open(buf)
+            img = img.resize((int(img.width * 0.7), int(img.height * 0.7)))  # Scale to 70%
             
-            st.pyplot(fig, clear_figure=True)
-            
-            st.markdown("</div>", unsafe_allow_html=True)
-
-            st.markdown('</div>', unsafe_allow_html=True)
-            all_figs[f"{feature}_heatmap"] = fig
+            st.image(img)
+            all_figs[f"{pollutant}_line_chart"] = fig
 
     def plot_indoor_vs_outdoor_scatter(indoor_df, outdoor_df, pollutants, all_figs):
         # Resample to hourly averages
@@ -1655,22 +1640,14 @@ if st.session_state.script_choice == "monthly_trends":
                 ax.set_xlabel(f"{pollutant.upper()} (Indoor)", fontsize=12)
                 ax.set_ylabel(f"{pollutant.upper()} (Outdoor)", fontsize=12)
                 ax.grid(True)
-                st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-                st.markdown("""
-                    <style>
-                        .chart-container {
-                            max-width: 400px;
-                            margin: auto;
-                        }
-                    </style>
-                    <div class='chart-container'>
-                """, unsafe_allow_html=True)
+                buf = io.BytesIO()
+                fig.savefig(buf, format="png", dpi=100, bbox_inches='tight')
+                buf.seek(0)
+                img = Image.open(buf)
+                img = img.resize((int(img.width * 0.7), int(img.height * 0.7)))  # Scale to 70%
                 
-                st.pyplot(fig, clear_figure=True)
-                
-                st.markdown("</div>", unsafe_allow_html=True)
-                st.markdown('</div>', unsafe_allow_html=True)
-                all_figs[f"{pollutant}_hourly_scatter_plot"] = fig
+                st.image(img)
+                all_figs[f"{pollutant}_line_chart"] = fig
 
     # Function to plot yearly data for residential buildings divided into seasons
     def plot_residential_seasonal_line_chart(indoor_df, pollutant, year, all_figs):
@@ -1697,23 +1674,14 @@ if st.session_state.script_choice == "monthly_trends":
         ax.legend(title="Season")
         ax.grid(True)
         ax.set_xlim(indoor_df.index.min(), indoor_df.index.max())
-        st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-        st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-        st.markdown("""
-                <style>
-                    .chart-container {
-                        max-width: 400px;
-                        margin: auto;
-                    }
-                </style>
-                <div class='chart-container'>
-            """, unsafe_allow_html=True)
+        buf = io.BytesIO()
+        fig.savefig(buf, format="png", dpi=100, bbox_inches='tight')
+        buf.seek(0)
+        img = Image.open(buf)
+        img = img.resize((int(img.width * 0.7), int(img.height * 0.7)))  # Scale to 70%
             
-        st.pyplot(fig, clear_figure=True)
-            
-        st.markdown("</div>", unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-        all_figs[f"{pollutant}_seasonal_chart_{year}"] = fig
+        st.image(img)
+        all_figs[f"{pollutant}_line_chart"] = fig
 
 
     st.markdown("""
