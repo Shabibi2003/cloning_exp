@@ -1523,7 +1523,7 @@ if st.session_state.script_choice == "monthly_trends":
             if indoor_col not in combined_df.columns:
                 continue
     
-            fig, ax = plt.subplots(figsize=(10, 6))
+            fig, ax = plt.subplots(figsize=(6, 4))
     
             # Plot indoor data
             combined_df[indoor_col].plot(ax=ax, label=f"{pollutant_display_names[pollutant]} (Indoor)", color='blue')
@@ -1534,7 +1534,7 @@ if st.session_state.script_choice == "monthly_trends":
             if pollutant.lower() not in ['co2', 'voc'] and outdoor_col in combined_df.columns:
                 combined_df[outdoor_col].plot(ax=ax, label=f"{pollutant_display_names[pollutant]} (Outdoor)", color='orange')
     
-            ax.set_title(f"{pollutant_display_names[pollutant]} - Indoor vs Outdoor", fontsize=14)
+            ax.set_title(f"{pollutant_display_names[pollutant]} - Indoor vs Outdoor", fontsize=12)
             ax.set_xlabel("Date", fontsize=12)
             ax.set_ylabel(pollutant_display_names[pollutant], fontsize=12)
             ax.legend()
@@ -1584,7 +1584,7 @@ if st.session_state.script_choice == "monthly_trends":
                     if week_row < 5:
                         calendar_data[week_row, week_col] = daily_avg
     
-            fig, ax = plt.subplots(figsize=(10, 6))
+            fig, ax = plt.subplots(figsize=(6, 4))
             color_list = ['#006400', '#228B22', '#FFFF00', '#FF7F00', '#FF0000', '#8B0000']
             cmap = ListedColormap(color_list)
             boundaries = feature_boundaries[feature]
@@ -1621,7 +1621,7 @@ if st.session_state.script_choice == "monthly_trends":
                 if data.empty:
                     continue
     
-                fig, ax = plt.subplots(figsize=(8, 6))
+                fig, ax = plt.subplots(figsize=(6, 4))
                 ax.scatter(data[pollutant + '_x'], data[pollutant + '_y'], color='purple', alpha=0.7)
                 ax.set_title(f"Hourly Avg: Indoor vs Outdoor - {pollutant.upper()}", fontsize=14)
                 ax.set_xlabel(f"{pollutant.upper()} (Indoor)", fontsize=12)
@@ -1640,7 +1640,7 @@ if st.session_state.script_choice == "monthly_trends":
         }
     
         yearly_df = indoor_df[(indoor_df.index.year == year) | ((indoor_df.index.year == year - 1) & (indoor_df.index.month == 12))]
-        fig, ax = plt.subplots(figsize=(10, 6))
+        fig, ax = plt.subplots(figsize=(6, 4))
         for season, months in seasons.items():
             seasonal_data = indoor_df[indoor_df.index.month.isin(months)]
             if not seasonal_data.empty:
@@ -1649,7 +1649,7 @@ if st.session_state.script_choice == "monthly_trends":
             else:
                 ax.plot([], [], label=f"{season} (No Data)")
     
-        ax.set_title(f"Yearly {pollutant.upper()} Trends for Residential Buildings ({year})", fontsize=14)
+        ax.set_title(f"Yearly {pollutant.upper()} Trends for Residential Buildings ({year})", fontsize=12)
         ax.set_xlabel("Date", fontsize=12)
         ax.set_ylabel(f"{pollutant.upper()}", fontsize=12)
         ax.legend(title="Season")
