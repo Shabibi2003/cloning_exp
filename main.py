@@ -1611,7 +1611,7 @@ if st.session_state.script_choice == "monthly_trends":
             img = img.resize((int(img.width * 0.7), int(img.height * 0.7)))  # Scale to 70%
             
             st.image(img)
-            all_figs[f"{feature}_line_chart"] = fig
+            all_figs[f"{feature}_heatmap"] = fig
 
     def plot_indoor_vs_outdoor_scatter(indoor_df, outdoor_df, pollutants, all_figs):
         # Resample to hourly averages
@@ -1637,7 +1637,7 @@ if st.session_state.script_choice == "monthly_trends":
                 img = img.resize((int(img.width * 0.7), int(img.height * 0.7)))  # Scale to 70%
                 
                 st.image(img)
-                all_figs[f"{pollutant}_line_chart"] = fig
+                all_figs[f"{pollutant}_scatter"] = fig
 
     def plot_residential_seasonal_line_chart(indoor_df, pollutants, year, all_figs):
         seasons = {
@@ -1672,7 +1672,7 @@ if st.session_state.script_choice == "monthly_trends":
             img = img.resize((int(img.width * 0.7), int(img.height * 0.7)))  # Scale to 70%
                 
             st.image(img)
-            all_figs[f"{pollutant}_line_chart"] = fig
+            all_figs[f"{pollutant}_seasonal_line_chart"] = fig
 
 
     st.markdown("""
