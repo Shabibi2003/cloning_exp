@@ -1385,6 +1385,17 @@ if st.session_state.script_choice == "login":
                 st.error("Invalid username or password")
     st.markdown("</div>", unsafe_allow_html=True)
 
+# Add CSS to reduce the size of charts in the monthly trends section
+st.markdown("""
+    <style>
+        .chart-container {
+            transform: scale(0.8); /* Reduce size to 80% */
+            transform-origin: top left; /* Anchor scaling to the top-left corner */
+        }
+    </style>
+""", unsafe_allow_html=True)
+
+# Wrap chart rendering in the monthly trends section with the new CSS class
 if st.session_state.script_choice == "monthly_trends":
     # Import necessary libraries
     import streamlit as st
@@ -1597,7 +1608,9 @@ if st.session_state.script_choice == "monthly_trends":
             cbar.set_ticklabels(labels)
             cbar.ax.tick_params(labelsize=12)
 
+            st.markdown('<div class="chart-container">', unsafe_allow_html=True)
             st.pyplot(fig)
+            st.markdown('</div>', unsafe_allow_html=True)
             all_figs[f"{feature}_heatmap"] = fig
 
     def plot_indoor_vs_outdoor_scatter(indoor_df, outdoor_df, pollutants, all_figs):
@@ -1617,7 +1630,9 @@ if st.session_state.script_choice == "monthly_trends":
                 ax.set_xlabel(f"{pollutant.upper()} (Indoor)", fontsize=12)
                 ax.set_ylabel(f"{pollutant.upper()} (Outdoor)", fontsize=12)
                 ax.grid(True)
+                st.markdown('<div class="chart-container">', unsafe_allow_html=True)
                 st.pyplot(fig)
+                st.markdown('</div>', unsafe_allow_html=True)
                 all_figs[f"{pollutant}_hourly_scatter_plot"] = fig
 
     # Function to plot yearly data for residential buildings divided into seasons
@@ -1645,7 +1660,9 @@ if st.session_state.script_choice == "monthly_trends":
         ax.legend(title="Season")
         ax.grid(True)
         ax.set_xlim(indoor_df.index.min(), indoor_df.index.max())
+        st.markdown('<div class="chart-container">', unsafe_allow_html=True)
         st.pyplot(fig)
+        st.markdown('</div>', unsafe_allow_html=True)
         all_figs[f"{pollutant}_seasonal_chart_{year}"] = fig
 
 
@@ -1923,4 +1940,4 @@ st.markdown(
     </div>
     """, unsafe_allow_html=True
 )
-st.markdown("<br>", unsafe_allow_html=True) 
+st.markdown("<br>", unsafe_allow_html=True)
