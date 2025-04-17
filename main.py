@@ -1802,20 +1802,13 @@ if st.session_state.script_choice == "monthly_trends":
                     st.markdown("<h3 style='font-size:30px; text-align:center; font-weight:bold;'>Line Charts of Indoor & Outdoor</h3>", unsafe_allow_html=True)
                     st.markdown("<br>", unsafe_allow_html=True)
 
-                    # Wrap line charts in smaller columns
-                    col1, col2, col3 = st.columns([1, 2, 1])  # Center the chart in the middle column
-                    with col2:
-                        plot_and_display_line_charts(indoor_df, outdoor_df, pollutant_display_names, all_figs)
+                    plot_and_display_line_charts(indoor_df, outdoor_df, pollutant_display_names, all_figs)
 
 
                     st.markdown("<br>", unsafe_allow_html=True)
                     st.markdown("<h3 style='font-size:30px; text-align:center; font-weight:bold;'>Indoor vs Outdoor Scatter Plots</h3>", unsafe_allow_html=True)
                     st.markdown("<br>", unsafe_allow_html=True)
-
-                    # Wrap scatter plots in smaller columns
-                    col1, col2, col3 = st.columns([1, 2, 1])  # Center the chart in the middle column
-                    with col2:
-                        plot_indoor_vs_outdoor_scatter(indoor_df_hourly, outdoor_df_hourly, ['aqi', 'pm10', 'pm25'], all_figs)
+                    plot_indoor_vs_outdoor_scatter(indoor_df_hourly, outdoor_df_hourly, ['aqi', 'pm10', 'pm25'], all_figs)
 
 
                 else:
@@ -1830,11 +1823,7 @@ if st.session_state.script_choice == "monthly_trends":
                     st.markdown("<br>", unsafe_allow_html=True)
                     st.markdown("<h3 style='font-size:30px; text-align:center; font-weight:bold;'>Seasonal Line Chart for Residential Buildings</h3>", unsafe_allow_html=True)
                     st.markdown("<br>", unsafe_allow_html=True)
-
-                    # Wrap seasonal line chart in smaller columns
-                    col1, col2, col3 = st.columns([1, 2, 1])  # Center the chart in the middle column
-                    with col2:
-                        plot_residential_seasonal_line_chart(indoor_df_year, "aqi", year, all_figs)
+                    plot_residential_seasonal_line_chart(indoor_df_year, "aqi", year, all_figs)
 
 
                 else:
@@ -1934,4 +1923,4 @@ st.markdown(
     </div>
     """, unsafe_allow_html=True
 )
-st.markdown("<br>", unsafe_allow_html=True)
+st.markdown("<br>", unsafe_allow_html=True) 
