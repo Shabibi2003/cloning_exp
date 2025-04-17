@@ -1692,7 +1692,7 @@ if st.session_state.script_choice == "monthly_trends":
     st.markdown("""
         <style>
             .title {
-                font-size: 36px;
+                font-size: 24px;
                 text-align: left;
                 padding: 20px;
             }
