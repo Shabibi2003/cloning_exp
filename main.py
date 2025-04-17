@@ -1639,39 +1639,40 @@ if st.session_state.script_choice == "monthly_trends":
                 st.image(img)
                 all_figs[f"{pollutant}_line_chart"] = fig
 
-    # Function to plot yearly data for residential buildings divided into seasons
-    def plot_residential_seasonal_line_chart(indoor_df, pollutant, year, all_figs):
+    def plot_residential_seasonal_line_chart(indoor_df, pollutants, year, all_figs):
         seasons = {
             "Spring": [2, 3, 4],
             "Summer": [5, 6, 7],
             "Autumn": [8, 9, 10],
             "Winter": [11, 12, 1]
         }
-
+    
         yearly_df = indoor_df[(indoor_df.index.year == year) | ((indoor_df.index.year == year - 1) & (indoor_df.index.month == 12))]
-        fig, ax = plt.subplots(figsize=(10, 6))
-        for season, months in seasons.items():
-            seasonal_data = indoor_df[indoor_df.index.month.isin(months)]
-            if not seasonal_data.empty:
-                seasonal_data = seasonal_data.resample('D').mean()
-                ax.plot(seasonal_data.index, seasonal_data[pollutant], label=season)
-            else:
-                ax.plot([], [], label=f"{season} (No Data)")
-
-        ax.set_title(f"Yearly {pollutant.upper()} Trends for Residential Buildings ({year})", fontsize=14)
-        ax.set_xlabel("Date", fontsize=12)
-        ax.set_ylabel(f"{pollutant.upper()}", fontsize=12)
-        ax.legend(title="Season")
-        ax.grid(True)
-        ax.set_xlim(indoor_df.index.min(), indoor_df.index.max())
-        buf = io.BytesIO()
-        fig.savefig(buf, format="png", dpi=100, bbox_inches='tight')
-        buf.seek(0)
-        img = Image.open(buf)
-        img = img.resize((int(img.width * 0.7), int(img.height * 0.7)))  # Scale to 70%
-            
-        st.image(img)
-        all_figs[f"{pollutant}_line_chart"] = fig
+        
+        for pollutant in pollutants:
+            fig, ax = plt.subplots(figsize=(10, 6))
+            for season, months in seasons.items():
+                seasonal_data = indoor_df[indoor_df.index.month.isin(months)]
+                if not seasonal_data.empty:
+                    seasonal_data = seasonal_data.resample('D').mean()
+                    ax.plot(seasonal_data.index, seasonal_data[pollutant], label=season)
+                else:
+                    ax.plot([], [], label=f"{season} (No Data)")
+    
+            ax.set_title(f"Yearly {pollutant.upper()} Trends for Residential Buildings ({year})", fontsize=14)
+            ax.set_xlabel("Date", fontsize=12)
+            ax.set_ylabel(f"{pollutant.upper()}", fontsize=12)
+            ax.legend(title="Season")
+            ax.grid(True)
+            ax.set_xlim(indoor_df.index.min(), indoor_df.index.max())
+            buf = io.BytesIO()
+            fig.savefig(buf, format="png", dpi=100, bbox_inches='tight')
+            buf.seek(0)
+            img = Image.open(buf)
+            img = img.resize((int(img.width * 0.7), int(img.height * 0.7)))  # Scale to 70%
+                
+            st.image(img)
+            all_figs[f"{pollutant}_line_chart"] = fig
 
 
     st.markdown("""
@@ -1839,15 +1840,16 @@ if st.session_state.script_choice == "monthly_trends":
 
                 # Generate seasonal line chart using all-year data
                 if indoor_rows_year:
-                    indoor_df_year = pd.DataFrame(indoor_rows_year, columns=["datetime", "pm25", "pm10", "aqi", "co2", "voc", "temp", "humidity"])
-                    indoor_df_year['datetime'] = pd.to_datetime(indoor_df_year['datetime'], format='%Y-%m-%d %H:%M:%S', errors='coerce')
-                    indoor_df_year.set_index('datetime', inplace=True)
+                indoor_df_year = pd.DataFrame(indoor_rows_year, columns=["datetime", "pm25", "pm10", "aqi", "co2", "voc", "temp", "humidity"])
+                indoor_df_year['datetime'] = pd.to_datetime(indoor_df_year['datetime'], format='%Y-%m-%d %H:%M:%S', errors='coerce')
+                indoor_df_year.set_index('datetime', inplace=True)
 
+                # Check if the device ID belongs to residential buildings
+                if device_id in residential_ids:
                     st.markdown("<br>", unsafe_allow_html=True)
                     st.markdown("<h3 style='font-size:30px; text-align:center; font-weight:bold;'>Seasonal Line Chart for Residential Buildings</h3>", unsafe_allow_html=True)
                     st.markdown("<br>", unsafe_allow_html=True)
-                    plot_residential_seasonal_line_chart(indoor_df_year, "aqi", year, all_figs)
-
+                    plot_residential_seasonal_line_chart(indoor_df_year, ['aqi', 'pm10', 'pm25'], year, all_figs)
 
                 else:
                     st.warning("No yearly data found for the selected Device ID.")
