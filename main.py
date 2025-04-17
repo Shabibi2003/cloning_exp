@@ -1541,7 +1541,20 @@ if st.session_state.script_choice == "monthly_trends":
             ax.legend()
             ax.grid(True)
 
-            st.pyplot(fig)
+            st.markdown("""
+                <style>
+                    .chart-container {
+                        max-width: 500px;
+                        margin: auto;
+                    }
+                </style>
+                <div class='chart-container'>
+            """, unsafe_allow_html=True)
+            
+            st.pyplot(fig, clear_figure=True)
+            
+            st.markdown("</div>", unsafe_allow_html=True)
+
             all_figs[f"{pollutant}_line_chart"] = fig
 
 
@@ -1609,7 +1622,20 @@ if st.session_state.script_choice == "monthly_trends":
             cbar.ax.tick_params(labelsize=12)
 
             st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-            st.pyplot(fig)
+            st.markdown("""
+                <style>
+                    .chart-container {
+                        max-width: 500px;
+                        margin: auto;
+                    }
+                </style>
+                <div class='chart-container'>
+            """, unsafe_allow_html=True)
+            
+            st.pyplot(fig, clear_figure=True)
+            
+            st.markdown("</div>", unsafe_allow_html=True)
+
             st.markdown('</div>', unsafe_allow_html=True)
             all_figs[f"{feature}_heatmap"] = fig
 
@@ -1631,7 +1657,19 @@ if st.session_state.script_choice == "monthly_trends":
                 ax.set_ylabel(f"{pollutant.upper()} (Outdoor)", fontsize=12)
                 ax.grid(True)
                 st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-                st.pyplot(fig)
+                st.markdown("""
+                    <style>
+                        .chart-container {
+                            max-width: 500px;
+                            margin: auto;
+                        }
+                    </style>
+                    <div class='chart-container'>
+                """, unsafe_allow_html=True)
+                
+                st.pyplot(fig, clear_figure=True)
+                
+                st.markdown("</div>", unsafe_allow_html=True)
                 st.markdown('</div>', unsafe_allow_html=True)
                 all_figs[f"{pollutant}_hourly_scatter_plot"] = fig
 
@@ -1661,7 +1699,20 @@ if st.session_state.script_choice == "monthly_trends":
         ax.grid(True)
         ax.set_xlim(indoor_df.index.min(), indoor_df.index.max())
         st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-        st.pyplot(fig)
+        st.markdown('<div class="chart-container">', unsafe_allow_html=True)
+        st.markdown("""
+                <style>
+                    .chart-container {
+                        max-width: 500px;
+                        margin: auto;
+                    }
+                </style>
+                <div class='chart-container'>
+            """, unsafe_allow_html=True)
+            
+        st.pyplot(fig, clear_figure=True)
+            
+        st.markdown("</div>", unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
         all_figs[f"{pollutant}_seasonal_chart_{year}"] = fig
 
