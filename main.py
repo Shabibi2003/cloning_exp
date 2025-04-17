@@ -1773,7 +1773,7 @@ if st.session_state.script_choice == "monthly_trends":
                 outdoor_rows = cursor.fetchall()
 
                 if indoor_rows and outdoor_rows:
-                    # Process indoor data for the selected month
+                # Process indoor data for the selected month
                     indoor_df = pd.DataFrame(indoor_rows, columns=["datetime", "pm25", "pm10", "aqi", "co2", "voc", "temp", "humidity"])
                     indoor_df['datetime'] = pd.to_datetime(indoor_df['datetime'], format='%Y-%m-%d %H:%M:%S', errors='coerce')
                     indoor_df.set_index('datetime', inplace=True)
@@ -1840,17 +1840,18 @@ if st.session_state.script_choice == "monthly_trends":
 
                 # Generate seasonal line chart using all-year data
                 if indoor_rows_year:
-                indoor_df_year = pd.DataFrame(indoor_rows_year, columns=["datetime", "pm25", "pm10", "aqi", "co2", "voc", "temp", "humidity"])
-                indoor_df_year['datetime'] = pd.to_datetime(indoor_df_year['datetime'], format='%Y-%m-%d %H:%M:%S', errors='coerce')
-                indoor_df_year.set_index('datetime', inplace=True)
+                    indoor_df_year = pd.DataFrame(indoor_rows_year, columns=["datetime", "pm25", "pm10", "aqi", "co2", "voc", "temp", "humidity"])
+                    indoor_df_year['datetime'] = pd.to_datetime(indoor_df_year['datetime'], format='%Y-%m-%d %H:%M:%S', errors='coerce')
+                    indoor_df_year.set_index('datetime', inplace=True)
 
-                # Check if the device ID belongs to residential buildings
-                if device_id in residential_ids:
-                    st.markdown("<br>", unsafe_allow_html=True)
-                    st.markdown("<h3 style='font-size:30px; text-align:center; font-weight:bold;'>Seasonal Line Chart for Residential Buildings</h3>", unsafe_allow_html=True)
-                    st.markdown("<br>", unsafe_allow_html=True)
-                    plot_residential_seasonal_line_chart(indoor_df_year, ['aqi', 'pm10', 'pm25'], year, all_figs)
-
+                    # Check if the device ID belongs to residential buildings
+                    if device_id in residential_ids:
+                        st.markdown("<br>", unsafe_allow_html=True)
+                        st.markdown("<h3 style='font-size:30px; text-align:center; font-weight:bold;'>Seasonal Line Chart for Residential Buildings</h3>", unsafe_allow_html=True)
+                        st.markdown("<br>", unsafe_allow_html=True)
+                        plot_residential_seasonal_line_chart(indoor_df_year, ['aqi', 'pm10', 'pm25'], year, all_figs)
+                    else:
+                        st.info("Seasonal line charts are only available for residential buildings.")
                 else:
                     st.warning("No yearly data found for the selected Device ID.")
                 
