@@ -1755,10 +1755,10 @@ if st.session_state.script_choice == "monthly_trends":
                     + 0.00085282 * T_f * R ** 2 - 0.00000199 * T_f ** 2 * R ** 2)
         
             # Apply adjustment if conditions met
-            if R < 13 and 80 <= T_f <= 112:
+            if 80 <= T_f <= 112:
                     adjustment = ((13 - R) / 4) * ((17 - abs(T_f - 95)) / 17) ** 0.5
                     HI_f -= adjustment
-            elif R > 85 and 80 <= T_f <= 87:
+            elif 80 <= T_f <= 87:
                     adjustment = ((R - 85) / 10) * ((87 - T_f) / 5)
                     HI_f += adjustment
         
