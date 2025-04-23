@@ -1786,15 +1786,22 @@ if st.session_state.script_choice == "monthly_trends":
     
         # Calculate daily Heat Index
         for day in range(1, num_days + 1):
-            if day in daily_averages.index.day:
-                temp = daily_averages.loc[daily_averages.index.day == day, 'temp'].mean()
-                humidity = daily_averages.loc[daily_averages.index.day == day, 'humidity'].mean()
+            # Get data for the specific day
+            day_data = daily_averages[daily_averages.index.day == day]
+        
+            if not day_data.empty:
+                temp = float(day_data['temp'].iloc[0])       # Extract as scalar float
+                humidity = float(day_data['humidity'].iloc[0])
+        
                 if not np.isnan(temp) and not np.isnan(humidity):
                     heat_index = calculate_heat_index(temp, humidity)
+        
                     week_row = (day + first_day_of_month - 1) // 7
                     week_col = (day + first_day_of_month - 1) % 7
-                    if week_row < 5:
+        
+                    if week_row < calendar_data.shape[0]:  # Dynamically support up to 6 weeks
                         calendar_data[week_row, week_col] = heat_index
+
     
         # Plot Heat Index heatmap
         fig, ax = plt.subplots(figsize=(10, 6))
