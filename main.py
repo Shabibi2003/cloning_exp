@@ -1740,11 +1740,11 @@ if st.session_state.script_choice == "monthly_trends":
     def plot_and_display_heat_index_heatmap(indoor_df, year, month, all_figs):
         num_days = calendar.monthrange(year, month)[1]
         first_day_of_month = calendar.monthrange(year, month)[0]
-        calendar_data = np.full((5, 7), np.nan)
+        calendar_data = np.full((6, 7), np.nan)
         daily_averages = indoor_df.resample('D').mean()
 
         def calculate_heat_index(T, R):
-            if T <= 26:
+            if T < 26:
                 # Use simplified formula for T < 26°C
                 return 0.5 * (T + 61.0 + ((T - 68.0) * 1.2) + (R * 0.094))
             else:
@@ -1775,7 +1775,7 @@ if st.session_state.script_choice == "monthly_trends":
                     heat_index = calculate_heat_index(temp, humidity)
                     week_row = (day + first_day_of_month - 1) // 7
                     week_col = (day + first_day_of_month - 1) % 7
-                    if week_row < 5:
+                    if week_row < 6:
                         calendar_data[week_row, week_col] = heat_index
     
         # Plot Heat Index heatmap
