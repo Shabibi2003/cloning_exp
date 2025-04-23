@@ -1628,7 +1628,7 @@ if st.session_state.script_choice == "monthly_trends":
 
             # Dynamically adjust the colormap to match the number of bins
             n_bins = len(boundaries) - 1
-            color_list = ['#006400', '#FFFF00', '#FFA500', '#FF0000', '#FF0000', '#A52A2A'][:n_bins]
+            color_list = ['#006400', '#FFFF00', '#FFA500', '#FF0000', '#800080', '#0000FF'][:n_bins]
             cmap = ListedColormap(color_list)
             norm = BoundaryNorm(boundaries, cmap.N)
 
@@ -1926,6 +1926,7 @@ if st.session_state.script_choice == "monthly_trends":
                     # Generate heatmaps and other plots using one-month data
                     features = ['pm25', 'pm10', 'aqi', 'co2', 'voc', 'temp', 'humidity']
                     plot_and_display_feature_heatmaps(indoor_df, features, year, selected_month, all_figs)
+                    plot_and_display_heat_index_heatmap(indoor_df, year, selected_month, all_figs)
 
 
                     st.markdown("<br>", unsafe_allow_html=True)
@@ -1940,10 +1941,6 @@ if st.session_state.script_choice == "monthly_trends":
                     st.markdown("<br>", unsafe_allow_html=True)
                     plot_indoor_vs_outdoor_scatter(indoor_df_hourly, outdoor_df_hourly, ['aqi', 'pm10', 'pm25'], all_figs)
 
-                    st.markdown("<br>", unsafe_allow_html=True)
-                    st.markdown("<h3 style='font-size:30px; text-align:left; font-weight:bold;'>Indoor vs Outdoor Scatter Plots</h3>", unsafe_allow_html=True)
-                    st.markdown("<br>", unsafe_allow_html=True)
-                    plot_and_display_heat_index_heatmap(indoor_df, year, month, all_figs)
 
                 else:
                     st.warning("No data found for the given Device ID and selected month.")
