@@ -1628,7 +1628,7 @@ if st.session_state.script_choice == "monthly_trends":
 
             # Dynamically adjust the colormap to match the number of bins
             n_bins = len(boundaries) - 1
-            color_list = ['#006400', '#FFFF00', '#FFA500', '#FF0000', '#800080', '#A52A2A'][:n_bins]
+            color_list = ['#006400', '#FFFF00', '#FFA500', '#FF0000', '#FF0000', '#A52A2A'][:n_bins]
             cmap = ListedColormap(color_list)
             norm = BoundaryNorm(boundaries, cmap.N)
 
