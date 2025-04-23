@@ -1740,7 +1740,6 @@ if st.session_state.script_choice == "monthly_trends":
         calendar_data = np.full((5, 7), np.nan)
         daily_averages = indoor_df.resample('D').mean()
 
-    # Heat Index formula
         def calculate_heat_index(T, R):
             T_f = T * 9/5 + 32  # Convert Celsius to Fahrenheit
             HI_f = (-42.379 + 2.04901523 * T_f + 10.14333127 * R
