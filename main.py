@@ -1740,30 +1740,23 @@ if st.session_state.script_choice == "monthly_trends":
     def plot_and_display_heat_index_heatmap(indoor_df, year, month, all_figs):
         num_days = calendar.monthrange(year, month)[1]
         first_day_of_month = calendar.monthrange(year, month)[0]
-        calendar_data = np.full((6, 7), np.nan)
+        calendar_data = np.full((5, 7), np.nan)
         daily_averages = indoor_df.resample('D').mean()
 
         def calculate_heat_index(T, R):
-            
-            # Convert Celsius to Fahrenheit
-            T_f = T * 9/5 + 32
-        
-            # Heat Index formula
-            HI_f = (-42.379 + 2.04901523 * T_f + 10.14333127 * R
-                    - 0.22475541 * T_f * R - 0.00683783 * T_f ** 2
-                    - 0.05481717 * R ** 2 + 0.00122874 * T_f ** 2 * R
-                    + 0.00085282 * T_f * R ** 2 - 0.00000199 * T_f ** 2 * R ** 2)
-        
-            # Apply adjustment if conditions met
-            if 80 <= T_f <= 112:
-                    adjustment = ((13 - R) / 4) * ((17 - abs(T_f - 95)) / 17) ** 0.5
-                    HI_f -= adjustment
-            elif 80 <= T_f <= 87:
-                    adjustment = ((R - 85) / 10) * ((87 - T_f) / 5)
-                    HI_f += adjustment
-        
+            if T <= 26:
+                # Use simplified formula for T < 26°C
+                return 0.5 * (T + 61.0 + ((T - 68.0) * 1.2) + (R * 0.094))
+            else:
+                # Convert Celsius to Fahrenheit
+                T_f = T * 9/5 + 32
+                # Apply full NOAA heat index formula
+                HI_f = (-42.379 + 2.04901523 * T_f + 10.14333127 * R
+                        - 0.22475541 * T_f * R - 0.00683783 * T_f ** 2
+                        - 0.05481717 * R ** 2 + 0.00122874 * T_f ** 2 * R
+                        + 0.00085282 * T_f * R ** 2 - 0.00000199 * T_f ** 2 * R ** 2)
                 # Convert back to Celsius
-            return (HI_f - 32) * 5/9
+                return (HI_f - 32) * 5/9
 
     
         # Heat Index boundaries and labels
@@ -1782,7 +1775,7 @@ if st.session_state.script_choice == "monthly_trends":
                     heat_index = calculate_heat_index(temp, humidity)
                     week_row = (day + first_day_of_month - 1) // 7
                     week_col = (day + first_day_of_month - 1) % 7
-                    if week_row < 6:
+                    if week_row < 5:
                         calendar_data[week_row, week_col] = heat_index
     
         # Plot Heat Index heatmap
@@ -1811,7 +1804,6 @@ if st.session_state.script_choice == "monthly_trends":
     
         st.image(img)
         all_figs[f"Heat_Index"] = fig
-
 
 
     # Create columns for user inputs (deviceID, year, month)
