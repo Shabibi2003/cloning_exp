@@ -1735,9 +1735,10 @@ if st.session_state.script_choice == "monthly_trends":
     st.markdown("<br>", unsafe_allow_html=True)
 
     def plot_and_display_heat_index_heatmap(indoor_df, year, month, all_figs):
-    """
+        """
     Generate a heatmap for the Heat Index using daily average temperature and humidity.
     """
+    pass  # Replace this with the actual implementation of the function
     num_days = calendar.monthrange(year, month)[1]
     first_day_of_month = calendar.monthrange(year, month)[0]
     calendar_data = np.full((5, 7), np.nan)
