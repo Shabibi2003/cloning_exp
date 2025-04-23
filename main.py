@@ -1734,6 +1734,72 @@ if st.session_state.script_choice == "monthly_trends":
     st.markdown('<h3 class="title">Indoor & Outdoor Air Quality Trends</h3>', unsafe_allow_html=True)
     st.markdown("<br>", unsafe_allow_html=True)
 
+    def plot_and_display_heat_index_heatmap(indoor_df, year, month, all_figs):
+    """
+    Generate a heatmap for the Heat Index using daily average temperature and humidity.
+    """
+    num_days = calendar.monthrange(year, month)[1]
+    first_day_of_month = calendar.monthrange(year, month)[0]
+    calendar_data = np.full((5, 7), np.nan)
+    daily_averages = indoor_df.resample('D').mean()
+
+    # Heat Index formula
+    def calculate_heat_index(T, R):
+        T_f = T * 9/5 + 32  # Convert Celsius to Fahrenheit
+        HI_f = (-42.379 + 2.04901523 * T_f + 10.14333127 * R
+                - 0.22475541 * T_f * R - 0.00683783 * T_f ** 2
+                - 0.05481717 * R ** 2 + 0.00122874 * T_f ** 2 * R
+                + 0.00085282 * T_f * R ** 2 - 0.00000199 * T_f ** 2 * R ** 2)
+        return (HI_f - 32) * 5/9  # Convert back to Celsius
+
+    # Heat Index boundaries and labels
+    boundaries = [0, 27, 32, 41, 54, 100]
+    labels = ['Satisfactory', 'Moderate', 'Poor', 'Very Poor', 'Severe']
+    color_list = ['#006400', '#228B22', '#FFFF00', '#FF7F00', '#FF0000']
+    cmap = ListedColormap(color_list)
+    norm = BoundaryNorm(boundaries, cmap.N)
+
+    # Calculate daily Heat Index
+    for day in range(1, num_days + 1):
+        if day in daily_averages.index.day:
+            temp = daily_averages.loc[daily_averages.index.day == day, 'temp'].mean()
+            humidity = daily_averages.loc[daily_averages.index.day == day, 'humidity'].mean()
+            if not np.isnan(temp) and not np.isnan(humidity):
+                heat_index = calculate_heat_index(temp, humidity)
+                week_row = (day + first_day_of_month - 1) // 7
+                week_col = (day + first_day_of_month - 1) % 7
+                if week_row < 5:
+                    calendar_data[week_row, week_col] = heat_index
+
+    # Plot Heat Index heatmap
+    fig, ax = plt.subplots(figsize=(10, 6))
+    sns.heatmap(calendar_data, annot=True, fmt=".1f", cmap=cmap, norm=norm,
+                cbar=False, xticklabels=['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                yticklabels=False, ax=ax, linewidths=1, linecolor='black', annot_kws={"size": 14})
+    ax.xaxis.tick_top()
+    ax.set_title(f"Daily Average Heat Index (°C) - {calendar.month_name[month]} {year}", fontsize=14, pad=35)
+    ax.set_xlabel(f"{calendar.month_name[month]} {year}", fontsize=12)
+    ax.set_ylabel("Week", fontsize=12)
+    ax.set_yticks([])
+
+    # Add color bar
+    fig.subplots_adjust(right=0.85)
+    cbar_ax = fig.add_axes([0.87, 0.1, 0.03, 0.8])
+    cbar = fig.colorbar(plt.cm.ScalarMappable(norm=norm, cmap=cmap), cax=cbar_ax, orientation='vertical')
+    cbar.set_ticks([(b + b_next) / 2 for b, b_next in zip(boundaries[:-1], boundaries[1:])])
+    cbar.set_ticklabels(labels)
+    cbar.ax.tick_params(labelsize=12)
+    buf = io.BytesIO()
+    fig.savefig(buf, format="png", dpi=100, bbox_inches='tight')
+    buf.seek(0)
+    img = Image.open(buf)
+    img = img.resize((int(img.width * 0.7), int(img.height * 0.7)))  # Scale to 70%
+
+    st.image(img)
+    all_figs[f"{pollutant}_seasonal_line_chart"] = fig
+
+
+
     # Create columns for user inputs (deviceID, year, month)
     col1, col2, col3 = st.columns(3)    
     with col1:
