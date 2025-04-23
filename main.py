@@ -1744,9 +1744,10 @@ if st.session_state.script_choice == "monthly_trends":
         daily_averages = indoor_df.resample('D').mean()
 
         def calculate_heat_index(T, R):
-            if T <= 26:
-                # Use simplified formula for T < 26°C
-                return 0.5 * (T + 61.0 + ((T - 68.0) * 1.2) + (R * 0.094))
+            if T <= 26 and R <= 40:
+                T_f = T * 9/5 + 32
+                adjustment = ((13 - R) / 4) * ((17 - abs(T_f - 95)) / 17) ** 0.5
+                return  HI_f - adjustment
             else:
                 # Convert Celsius to Fahrenheit
                 T_f = T * 9/5 + 32
