@@ -1749,7 +1749,7 @@ if st.session_state.script_choice == "monthly_trends":
             return (HI_f - 32) * 5/9  # Convert back to Celsius
     
         # Heat Index boundaries and labels
-        boundaries = [0, 27, 32, 41, 54, 100]
+        boundaries = [27, 32, 41, 54, 100]
         labels = ['Satisfactory', 'Moderate', 'Poor', 'Very Poor', 'Severe']
         color_list = ['#006400', '#228B22', '#FFFF00', '#FF7F00', '#FF0000']
         cmap = ListedColormap(color_list)
