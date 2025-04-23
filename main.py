@@ -1744,16 +1744,30 @@ if st.session_state.script_choice == "monthly_trends":
         daily_averages = indoor_df.resample('D').mean()
 
         def calculate_heat_index(T, R):
+            if T < 27 :
+                HI_f = 0.5 * (T + 61.0 + ((T - 68.0) * 1.2) + (R * 0.094))
+                return HI_f
             
+            else:
                 # Convert Celsius to Fahrenheit
-            T_f = T * 9/5 + 32
+                T_f = T * 9/5 + 32
                 # Apply full NOAA heat index formula
-            HI_f = (-42.379 + 2.04901523 * T_f + 10.14333127 * R
+                HI_f = (-42.379 + 2.04901523 * T_f + 10.14333127 * R
                         - 0.22475541 * T_f * R - 0.00683783 * T_f ** 2
                         - 0.05481717 * R ** 2 + 0.00122874 * T_f ** 2 * R
                         + 0.00085282 * T_f * R ** 2 - 0.00000199 * T_f ** 2 * R ** 2)
+            if 27 <= T <= 44 and R < 13:
+                T_f = T * 9/5 + 32
+                adjustment = ((13 - R) / 4) * ((17 - abs(T_f - 95)) / 17) ** 0.5
+                HI_f -= adjustment
+
+            elif R > 85 and 27 <= T <= 30:
+                T_f = T * 9/5 + 32
+                adjustment = ((R - 85) / 10) * ((87 - T) / 5)
+                HI_f += adjustment
+
                 # Convert back to Celsius
-            return (HI_f - 32) * 5/9
+                return (HI_f - 32) * 5/9
 
     
         # Heat Index boundaries and labels
