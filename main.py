@@ -1743,38 +1743,17 @@ if st.session_state.script_choice == "monthly_trends":
         calendar_data = np.full((5, 7), np.nan)
         daily_averages = indoor_df.resample('D').mean()
 
-    def calculate_heat_index(T_celsius, RH):
-        """
-        Calculate the Heat Index in Celsius based on temperature (°C) and relative humidity (%).
-        Applies Rothfusz regression with adjustments and falls back to Steadman formula for cool conditions.
-        """
-        # Convert Celsius to Fahrenheit
-        T = T_celsius * 9 / 5 + 32
-
-        # Simplified Steadman formula for T < 80°F (~26.7°C)
-        if T < 80:
-            HI_f = 0.5 * (T + 61.0 + ((T - 68.0) * 1.2) + (RH * 0.094))
-        else:
-            # Rothfusz regression equation
-            HI_f = (-42.379 + 2.04901523 * T + 10.14333127 * RH
-                    - 0.22475541 * T * RH - 0.00683783 * T ** 2
-                    - 0.05481717 * RH ** 2 + 0.00122874 * T ** 2 * RH
-                    + 0.00085282 * T * RH ** 2 - 0.00000199 * T ** 2 * RH ** 2)
-
-            # Apply low-humidity adjustment
-            if RH < 13 and 80 <= T <= 112:
-                adjustment = ((13 - RH) / 4) * ((17 - abs(T - 95)) / 17) ** 0.5
-                HI_f -= adjustment
-
-            # Apply high-humidity adjustment
-            elif RH > 85 and 80 <= T <= 87:
-                adjustment = ((RH - 85) / 10) * ((87 - T) / 5)
-                HI_f += adjustment
-
-        # Convert result back to Celsius
-        HI_celsius = (HI_f - 32) * 5 / 9
-        return HI_celsius
-
+        def calculate_heat_index(T, R):
+            
+                # Convert Celsius to Fahrenheit
+            T_f = T * 9/5 + 32
+                # Apply full NOAA heat index formula
+            HI_f = (-42.379 + 2.04901523 * T_f + 10.14333127 * R
+                        - 0.22475541 * T_f * R - 0.00683783 * T_f ** 2
+                        - 0.05481717 * R ** 2 + 0.00122874 * T_f ** 2 * R
+                        + 0.00085282 * T_f * R ** 2 - 0.00000199 * T_f ** 2 * R ** 2)
+                # Convert back to Celsius
+            return (HI_f - 32) * 5/9
 
     
         # Heat Index boundaries and labels
@@ -1914,17 +1893,16 @@ if st.session_state.script_choice == "monthly_trends":
                     indoor_df = indoor_df[(indoor_df[columns_to_check_indoor] != 0).all(axis=1)]
 
                     # Resample to daily averages after filtering out zero values
-                    if not indoor_df.empty:
-                        indoor_df = indoor_df.resample('D').mean()
+                    indoor_df = indoor_df.resample('D').mean()
 
                     indoor_df_hourly = pd.DataFrame(indoor_rows, columns=["datetime", "pm25", "pm10", "aqi", "co2", "voc", "temp", "humidity"])
                     indoor_df_hourly['datetime'] = pd.to_datetime(indoor_df_hourly['datetime'], format='%Y-%m-%d %H:%M:%S', errors='coerce')
                     indoor_df_hourly.set_index('datetime', inplace=True)
 
+                    columns_to_check_indoor = ['pm25', 'pm10', 'aqi', 'temp']  # Modify as needed
                     indoor_df_hourly = indoor_df_hourly[(indoor_df_hourly[columns_to_check_indoor] != 0).all(axis=1)]
 
-                    if not indoor_df_hourly.empty:
-                        indoor_df_hourly = indoor_df_hourly.resample('H').mean()
+                    indoor_df_hourly = indoor_df_hourly.resample('H').mean()
                     
                     # Process outdoor data
                     outdoor_df = pd.DataFrame(outdoor_rows, columns=["datetime", "pm25", "pm10", "aqi", "co2", "voc", "temp", "humidity"])
@@ -1935,17 +1913,19 @@ if st.session_state.script_choice == "monthly_trends":
                     columns_to_check_outdoor = ['pm25', 'pm10', 'aqi']  # Modify as needed
                     outdoor_df = outdoor_df[(outdoor_df[columns_to_check_outdoor] != 0).all(axis=1)]
 
-                    if not outdoor_df.empty:
-                        outdoor_df = outdoor_df.resample('D').mean()
+                    # Resample to daily averages after filtering out zero values
+                    outdoor_df = outdoor_df.resample('D').mean()
 
                     outdoor_df_hourly = pd.DataFrame(outdoor_rows, columns=["datetime", "pm25", "pm10", "aqi", "co2", "voc", "temp", "humidity"])
                     outdoor_df_hourly['datetime'] = pd.to_datetime(outdoor_df_hourly['datetime'], format='%Y-%m-%d %H:%M:%S', errors='coerce')
                     outdoor_df_hourly.set_index('datetime', inplace=True)
 
+                    # Filter outdoor data: Remove rows with zero in specific columns before resampling
+                    columns_to_check_outdoor = ['pm25', 'pm10', 'aqi']  
                     outdoor_df_hourly = outdoor_df_hourly[(outdoor_df_hourly[columns_to_check_outdoor] != 0).all(axis=1)]
 
-                    if not outdoor_df_hourly.empty:
-                        outdoor_df_hourly = outdoor_df_hourly.resample('H').mean()
+                    # Resample to hourly averages after filtering out zero values
+                    outdoor_df_hourly = outdoor_df_hourly.resample('H').mean()
 
                     # Generate heatmaps and other plots using one-month data
                     features = ['pm25', 'pm10', 'aqi', 'co2', 'voc', 'temp', 'humidity']
