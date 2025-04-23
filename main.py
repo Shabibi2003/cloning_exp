@@ -1786,22 +1786,15 @@ if st.session_state.script_choice == "monthly_trends":
     
         # Calculate daily Heat Index
         for day in range(1, num_days + 1):
-            # Get data for the specific day
-            day_data = daily_averages[daily_averages.index.day == day]
-        
-            if not day_data.empty:
-                temp = float(day_data['temp'].iloc[0])       # Extract as scalar float
-                humidity = float(day_data['humidity'].iloc[0])
-        
+            if day in daily_averages.index.day:
+                temp = daily_averages.loc[daily_averages.index.day == day, 'temp'].mean()
+                humidity = daily_averages.loc[daily_averages.index.day == day, 'humidity'].mean()
                 if not np.isnan(temp) and not np.isnan(humidity):
                     heat_index = calculate_heat_index(temp, humidity)
-        
                     week_row = (day + first_day_of_month - 1) // 7
                     week_col = (day + first_day_of_month - 1) % 7
-        
-                    if week_row < calendar_data.shape[0]:  # Dynamically support up to 6 weeks
+                    if week_row < 5:
                         calendar_data[week_row, week_col] = heat_index
-
     
         # Plot Heat Index heatmap
         fig, ax = plt.subplots(figsize=(10, 6))
@@ -1921,16 +1914,17 @@ if st.session_state.script_choice == "monthly_trends":
                     indoor_df = indoor_df[(indoor_df[columns_to_check_indoor] != 0).all(axis=1)]
 
                     # Resample to daily averages after filtering out zero values
-                    indoor_df = indoor_df.resample('D').mean()
+                    if not indoor_df.empty:
+                        indoor_df = indoor_df.resample('D').mean()
 
                     indoor_df_hourly = pd.DataFrame(indoor_rows, columns=["datetime", "pm25", "pm10", "aqi", "co2", "voc", "temp", "humidity"])
                     indoor_df_hourly['datetime'] = pd.to_datetime(indoor_df_hourly['datetime'], format='%Y-%m-%d %H:%M:%S', errors='coerce')
                     indoor_df_hourly.set_index('datetime', inplace=True)
 
-                    columns_to_check_indoor = ['pm25', 'pm10', 'aqi', 'temp']  # Modify as needed
                     indoor_df_hourly = indoor_df_hourly[(indoor_df_hourly[columns_to_check_indoor] != 0).all(axis=1)]
 
-                    indoor_df_hourly = indoor_df_hourly.resample('H').mean()
+                    if not indoor_df_hourly.empty:
+                        indoor_df_hourly = indoor_df_hourly.resample('H').mean()
                     
                     # Process outdoor data
                     outdoor_df = pd.DataFrame(outdoor_rows, columns=["datetime", "pm25", "pm10", "aqi", "co2", "voc", "temp", "humidity"])
@@ -1941,19 +1935,17 @@ if st.session_state.script_choice == "monthly_trends":
                     columns_to_check_outdoor = ['pm25', 'pm10', 'aqi']  # Modify as needed
                     outdoor_df = outdoor_df[(outdoor_df[columns_to_check_outdoor] != 0).all(axis=1)]
 
-                    # Resample to daily averages after filtering out zero values
-                    outdoor_df = outdoor_df.resample('D').mean()
+                    if not outdoor_df.empty:
+                        outdoor_df = outdoor_df.resample('D').mean()
 
                     outdoor_df_hourly = pd.DataFrame(outdoor_rows, columns=["datetime", "pm25", "pm10", "aqi", "co2", "voc", "temp", "humidity"])
                     outdoor_df_hourly['datetime'] = pd.to_datetime(outdoor_df_hourly['datetime'], format='%Y-%m-%d %H:%M:%S', errors='coerce')
                     outdoor_df_hourly.set_index('datetime', inplace=True)
 
-                    # Filter outdoor data: Remove rows with zero in specific columns before resampling
-                    columns_to_check_outdoor = ['pm25', 'pm10', 'aqi']  
                     outdoor_df_hourly = outdoor_df_hourly[(outdoor_df_hourly[columns_to_check_outdoor] != 0).all(axis=1)]
 
-                    # Resample to hourly averages after filtering out zero values
-                    outdoor_df_hourly = outdoor_df_hourly.resample('H').mean()
+                    if not outdoor_df_hourly.empty:
+                        outdoor_df_hourly = outdoor_df_hourly.resample('H').mean()
 
                     # Generate heatmaps and other plots using one-month data
                     features = ['pm25', 'pm10', 'aqi', 'co2', 'voc', 'temp', 'humidity']
