@@ -1743,21 +1743,38 @@ if st.session_state.script_choice == "monthly_trends":
         calendar_data = np.full((5, 7), np.nan)
         daily_averages = indoor_df.resample('D').mean()
 
-        def calculate_heat_index(T, R):
-            if T <= 26 and R <= 40:
-                T_f = T * 9/5 + 32
-                adjustment = ((13 - R) / 4) * ((17 - abs(T_f - 95)) / 17) ** 0.5
-                return  HI_f - adjustment
-            else:
-                # Convert Celsius to Fahrenheit
-                T_f = T * 9/5 + 32
-                # Apply full NOAA heat index formula
-                HI_f = (-42.379 + 2.04901523 * T_f + 10.14333127 * R
-                        - 0.22475541 * T_f * R - 0.00683783 * T_f ** 2
-                        - 0.05481717 * R ** 2 + 0.00122874 * T_f ** 2 * R
-                        + 0.00085282 * T_f * R ** 2 - 0.00000199 * T_f ** 2 * R ** 2)
-                # Convert back to Celsius
-                return (HI_f - 32) * 5/9
+    def calculate_heat_index(T_celsius, RH):
+        """
+        Calculate the Heat Index in Celsius based on temperature (°C) and relative humidity (%).
+        Applies Rothfusz regression with adjustments and falls back to Steadman formula for cool conditions.
+        """
+        # Convert Celsius to Fahrenheit
+        T = T_celsius * 9 / 5 + 32
+
+        # Simplified Steadman formula for T < 80°F (~26.7°C)
+        if T < 80:
+            HI_f = 0.5 * (T + 61.0 + ((T - 68.0) * 1.2) + (RH * 0.094))
+        else:
+            # Rothfusz regression equation
+            HI_f = (-42.379 + 2.04901523 * T + 10.14333127 * RH
+                    - 0.22475541 * T * RH - 0.00683783 * T ** 2
+                    - 0.05481717 * RH ** 2 + 0.00122874 * T ** 2 * RH
+                    + 0.00085282 * T * RH ** 2 - 0.00000199 * T ** 2 * RH ** 2)
+
+            # Apply low-humidity adjustment
+            if RH < 13 and 80 <= T <= 112:
+                adjustment = ((13 - RH) / 4) * ((17 - abs(T - 95)) / 17) ** 0.5
+                HI_f -= adjustment
+
+            # Apply high-humidity adjustment
+            elif RH > 85 and 80 <= T <= 87:
+                adjustment = ((RH - 85) / 10) * ((87 - T) / 5)
+                HI_f += adjustment
+
+        # Convert result back to Celsius
+        HI_celsius = (HI_f - 32) * 5 / 9
+        return HI_celsius
+
 
     
         # Heat Index boundaries and labels
