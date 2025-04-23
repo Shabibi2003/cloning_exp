@@ -1926,6 +1926,10 @@ if st.session_state.script_choice == "monthly_trends":
                     # Generate heatmaps and other plots using one-month data
                     features = ['pm25', 'pm10', 'aqi', 'co2', 'voc', 'temp', 'humidity']
                     plot_and_display_feature_heatmaps(indoor_df, features, year, selected_month, all_figs)
+                    
+                    st.markdown("<br>", unsafe_allow_html=True)
+                    st.markdown("<h3 style='font-size:30px; text-align:left; font-weight:bold;'>Heat Index (°C)</h3>", unsafe_allow_html=True)
+                    st.markdown("<br>", unsafe_allow_html=True)
                     plot_and_display_heat_index_heatmap(indoor_df, year, selected_month, all_figs)
 
 
