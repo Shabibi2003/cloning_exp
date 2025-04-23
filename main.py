@@ -1623,10 +1623,13 @@ if st.session_state.script_choice == "monthly_trends":
                         calendar_data[week_row, week_col] = daily_avg
 
             fig, ax = plt.subplots(figsize=(10, 6))
-            color_list = ['#006400', '#FFFF00', '#FFA500', '#FF0000']  # Colors for heat index
-            cmap = ListedColormap(color_list)
             boundaries = feature_boundaries[feature]
             labels = feature_labels[feature]
+
+            # Dynamically adjust the colormap to match the number of bins
+            n_bins = len(boundaries) - 1
+            color_list = ['#006400', '#FFFF00', '#FFA500', '#FF0000', '#800080', '#0000FF'][:n_bins]
+            cmap = ListedColormap(color_list)
             norm = BoundaryNorm(boundaries, cmap.N)
 
             sns.heatmap(calendar_data, annot=True, fmt=".0f", cmap=cmap, norm=norm,
@@ -1749,7 +1752,7 @@ if st.session_state.script_choice == "monthly_trends":
             return (HI_f - 32) * 5/9  # Convert back to Celsius
     
         # Heat Index boundaries and labels
-        boundaries = [27, 32, 41, 54, 100]
+        boundaries = [0,27, 32, 41, 54, 100]
         labels = ['Satisfactory', 'Moderate', 'Poor', 'Very Poor', 'Severe']
         color_list = ['#006400', '#228B22', '#FFFF00', '#FF7F00', '#FF0000']
         cmap = ListedColormap(color_list)
