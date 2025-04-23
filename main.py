@@ -1795,7 +1795,7 @@ if st.session_state.script_choice == "monthly_trends":
         img = img.resize((int(img.width * 0.7), int(img.height * 0.7)))  # Scale to 70%
     
         st.image(img)
-        all_figs[f"{pollutant}_seasonal_line_chart"] = fig
+        all_figs[f"Heat_Index"] = fig
 
 
 
