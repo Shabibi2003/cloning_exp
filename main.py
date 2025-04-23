@@ -1411,6 +1411,24 @@ if st.session_state.script_choice == "monthly_trends":
         pdf_buffer.seek(0)
         return pdf_buffer
 
+    def calculate_heat_index(temp_c, rh):
+        """
+        Calculate the heat index in Celsius using temperature (Celsius) and relative humidity (%).
+        """
+        # Convert Celsius to Fahrenheit
+        T = temp_c * 9 / 5 + 32
+        R = rh
+
+        # Apply full formula (valid only for T >= 80°F and RH >= 40%)
+        HI = (-42.379 + 2.04901523 * T + 10.14333127 * R
+              - 0.22475541 * T * R - 0.00683783 * T ** 2
+              - 0.05481717 * R ** 2 + 0.00122874 * T ** 2 * R
+              + 0.00085282 * T * R ** 2 - 0.00000199 * T ** 2 * R ** 2)
+
+        # Convert back to Celsius
+        HI_C = (HI - 32) * 5 / 9
+        return HI_C
+
     # Database connection details
     host = "139.59.34.149"
     user = "neemdb"
@@ -1498,7 +1516,8 @@ if st.session_state.script_choice == "monthly_trends":
         'co2': 'CO₂',
         'voc': 'VOC',
         'temp': 'Temp.',
-        'humidity': 'Humidity'
+        'humidity': 'Humidity',
+        'heat_index': 'Heat Index'
     }
 
     # Function to plot and display line charts for pollutants
@@ -1510,7 +1529,8 @@ if st.session_state.script_choice == "monthly_trends":
         'co2': 900,
         'voc': 500,
         'temp': 28,
-        'humidity': 70
+        'humidity': 70,
+        'heat_index': 41
       }
 
         combined_df = pd.concat(
@@ -1565,7 +1585,8 @@ if st.session_state.script_choice == "monthly_trends":
             'co2': [0, 900, 10000],
             'voc': [0, 500, 1000],
             'temp': [0, 18, 28, 50],
-            'humidity': [0, 50, 70, 100]
+            'humidity': [0, 50, 70, 100],
+            'heat_index': [0, 27, 32, 41, 54]
         }
 
         feature_labels = {
@@ -1575,13 +1596,19 @@ if st.session_state.script_choice == "monthly_trends":
             'co2': ['Good', 'Poor'],
             'voc': ['Good', 'Poor'],
             'temp': ['Low', 'Normal', 'High'],
-            'humidity': ['Low', 'Normal', 'High']
+            'humidity': ['Low', 'Normal', 'High'],
+            'heat_index': ['Comfortable', 'Caution', 'Extreme Caution', 'Danger']
         }
 
         num_days = calendar.monthrange(year, month)[1]
         first_day_of_month = calendar.monthrange(year, month)[0]
         calendar_data = np.full((5, 7), np.nan)
         daily_averages = indoor_df.resample('D').mean()
+
+        # Add heat index calculation
+        if 'temp' in indoor_df.columns and 'humidity' in indoor_df.columns:
+            indoor_df['heat_index'] = calculate_heat_index(indoor_df['temp'], indoor_df['humidity'])
+            features.append('heat_index')  # Add heat index to the list of features
 
         for feature in features:
             if feature not in daily_averages.columns:
@@ -1596,10 +1623,13 @@ if st.session_state.script_choice == "monthly_trends":
                         calendar_data[week_row, week_col] = daily_avg
 
             fig, ax = plt.subplots(figsize=(10, 6))
-            color_list = ['#006400', '#228B22', '#FFFF00', '#FF7F00', '#FF0000', '#8B0000']
-            cmap = ListedColormap(color_list)
             boundaries = feature_boundaries[feature]
             labels = feature_labels[feature]
+
+            # Dynamically adjust the colormap to match the number of bins
+            n_bins = len(boundaries) - 1
+            color_list = ['#006400', '#228B22', '#FFFF00', '#FF7F00', '#FF0000', '#8B0000']
+            cmap = ListedColormap(color_list)
             norm = BoundaryNorm(boundaries, cmap.N)
 
             sns.heatmap(calendar_data, annot=True, fmt=".0f", cmap=cmap, norm=norm,
@@ -1706,6 +1736,68 @@ if st.session_state.script_choice == "monthly_trends":
 
     st.markdown('<h3 class="title">Indoor & Outdoor Air Quality Trends</h3>', unsafe_allow_html=True)
     st.markdown("<br>", unsafe_allow_html=True)
+
+    def plot_and_display_heat_index_heatmap(indoor_df, year, month, all_figs):
+        num_days = calendar.monthrange(year, month)[1]
+        first_day_of_month = calendar.monthrange(year, month)[0]
+        calendar_data = np.full((5, 7), np.nan)
+        daily_averages = indoor_df.resample('D').mean()
+
+        def calculate_heat_index(T, R):
+            T_f = T * 9/5 + 32  # Convert Celsius to Fahrenheit
+            HI_f = (-42.379 + 2.04901523 * T_f + 10.14333127 * R
+                    - 0.22475541 * T_f * R - 0.00683783 * T_f ** 2
+                    - 0.05481717 * R ** 2 + 0.00122874 * T_f ** 2 * R
+                    + 0.00085282 * T_f * R ** 2 - 0.00000199 * T_f ** 2 * R ** 2)
+            return (HI_f - 32) * 5/9  # Convert back to Celsius
+    
+        # Heat Index boundaries and labels
+        boundaries = [0,27, 32, 41, 54, 100]
+        labels = ['Satisfactory', 'Moderate', 'Poor', 'Very Poor', 'Severe']
+        color_list = ['#006400', '#228B22', '#FFFF00', '#FF7F00', '#FF0000']
+        cmap = ListedColormap(color_list)
+        norm = BoundaryNorm(boundaries, cmap.N)
+    
+        # Calculate daily Heat Index
+        for day in range(1, num_days + 1):
+            if day in daily_averages.index.day:
+                temp = daily_averages.loc[daily_averages.index.day == day, 'temp'].mean()
+                humidity = daily_averages.loc[daily_averages.index.day == day, 'humidity'].mean()
+                if not np.isnan(temp) and not np.isnan(humidity):
+                    heat_index = calculate_heat_index(temp, humidity)
+                    week_row = (day + first_day_of_month - 1) // 7
+                    week_col = (day + first_day_of_month - 1) % 7
+                    if week_row < 5:
+                        calendar_data[week_row, week_col] = heat_index
+    
+        # Plot Heat Index heatmap
+        fig, ax = plt.subplots(figsize=(10, 6))
+        sns.heatmap(calendar_data, annot=True, fmt=".1f", cmap=cmap, norm=norm,
+                    cbar=False, xticklabels=['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    yticklabels=False, ax=ax, linewidths=1, linecolor='black', annot_kws={"size": 14})
+        ax.xaxis.tick_top()
+        ax.set_title(f"Daily Average Heat Index (°C) - {calendar.month_name[month]} {year}", fontsize=14, pad=35)
+        ax.set_xlabel(f"{calendar.month_name[month]} {year}", fontsize=12)
+        ax.set_ylabel("Week", fontsize=12)
+        ax.set_yticks([])
+    
+        # Add color bar
+        fig.subplots_adjust(right=0.85)
+        cbar_ax = fig.add_axes([0.87, 0.1, 0.03, 0.8])
+        cbar = fig.colorbar(plt.cm.ScalarMappable(norm=norm, cmap=cmap), cax=cbar_ax, orientation='vertical')
+        cbar.set_ticks([(b + b_next) / 2 for b, b_next in zip(boundaries[:-1], boundaries[1:])])
+        cbar.set_ticklabels(labels)
+        cbar.ax.tick_params(labelsize=12)
+        buf = io.BytesIO()
+        fig.savefig(buf, format="png", dpi=100, bbox_inches='tight')
+        buf.seek(0)
+        img = Image.open(buf)
+        img = img.resize((int(img.width * 0.7), int(img.height * 0.7)))  # Scale to 70%
+    
+        st.image(img)
+        all_figs[f"Heat_Index"] = fig
+
+
 
     # Create columns for user inputs (deviceID, year, month)
     col1, col2, col3 = st.columns(3)    
@@ -1834,6 +1926,11 @@ if st.session_state.script_choice == "monthly_trends":
                     # Generate heatmaps and other plots using one-month data
                     features = ['pm25', 'pm10', 'aqi', 'co2', 'voc', 'temp', 'humidity']
                     plot_and_display_feature_heatmaps(indoor_df, features, year, selected_month, all_figs)
+                    
+                    st.markdown("<br>", unsafe_allow_html=True)
+                    st.markdown("<h3 style='font-size:30px; text-align:left; font-weight:bold;'>Heat Index (°C)</h3>", unsafe_allow_html=True)
+                    st.markdown("<br>", unsafe_allow_html=True)
+                    plot_and_display_heat_index_heatmap(indoor_df, year, selected_month, all_figs)
 
 
                     st.markdown("<br>", unsafe_allow_html=True)
