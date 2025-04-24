@@ -1485,6 +1485,7 @@ if st.session_state.script_choice == "monthly_trends":
         "1202240027": "DELCPCB010",
         "1203240076": "DELCPCB010",
         "1203240078": "DELCPCB010",
+        "1201240078": "CPCB1703205345",
         "1203240075": "DELCPCB010",
         "1201240077": "DELDPCC016",
         "1201240072": "DELDPCC016",
