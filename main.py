@@ -1411,23 +1411,6 @@ if st.session_state.script_choice == "monthly_trends":
         pdf_buffer.seek(0)
         return pdf_buffer
 
-    def calculate_heat_index(temp_c, rh):
-        """
-        Calculate the heat index in Celsius using temperature (Celsius) and relative humidity (%).
-        """
-        # Convert Celsius to Fahrenheit
-        T = temp_c * 9 / 5 + 32
-        R = rh
-
-        # Apply full formula (valid only for T >= 80°F and RH >= 40%)
-        HI = (-42.379 + 2.04901523 * T + 10.14333127 * R
-              - 0.22475541 * T * R - 0.00683783 * T ** 2
-              - 0.05481717 * R ** 2 + 0.00122874 * T ** 2 * R
-              + 0.00085282 * T * R ** 2 - 0.00000199 * T ** 2 * R ** 2)
-
-        # Convert back to Celsius
-        HI_C = (HI - 32) * 5 / 9
-        return HI_C
 
     # Database connection details
     host = "139.59.34.149"
@@ -1605,11 +1588,6 @@ if st.session_state.script_choice == "monthly_trends":
         first_day_of_month = calendar.monthrange(year, month)[0]
         calendar_data = np.full((5, 7), np.nan)
         daily_averages = indoor_df.resample('D').mean()
-
-        # Add heat index calculation
-        if 'temp' in indoor_df.columns and 'humidity' in indoor_df.columns:
-            indoor_df['heat_index'] = calculate_heat_index(indoor_df['temp'], indoor_df['humidity'])
-            features.append('heat_index')  # Add heat index to the list of features
 
         for feature in features:
             if feature not in daily_averages.columns:
