@@ -1775,7 +1775,7 @@ if st.session_state.script_choice == "monthly_trends":
         fig, ax = plt.subplots(figsize=(10, 6))
         indoor_df_hourly['heat_index'].plot(ax=ax, color='blue', linewidth=2, label="Indoor Heat Index")
         outdoor_df_hourly['heat_index'].plot(ax=ax, color='orange', linewidth=2, label="Outdoor Heat Index")
-        ax.axhline(y=27, color='brown', linestyle='--', linewidth=1.5, label="Caution (27°C)")
+        ax.axhline(y=26.6, color='brown', linestyle='--', linewidth=1.5, label="Caution (26.6°C)")
         ax.axhline(y=40, color='red', linestyle='--', linewidth=1.5, label="Danger (40°C)")
         ax.set_title("Hourly Average Heat Index (°C)", fontsize=16)
         ax.set_xlabel("Time", fontsize=12)
