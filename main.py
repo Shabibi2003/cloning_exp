@@ -2126,8 +2126,6 @@ elif st.session_state.script_choice == 'device_data_comparison':
             st.write(f"Location: {device_data[device_id_3][0]}")
             st.write(f"Type: {device_data[device_id_3][1]}")
     
-    st.markdown('<hr style="border:1px solid black">', unsafe_allow_html=True)
-    
     # Add date range selection
     col1, col2, col3 = st.columns(3)
     with col1:
@@ -2138,7 +2136,8 @@ elif st.session_state.script_choice == 'device_data_comparison':
     with col3:
         pollutant = st.selectbox("Select Pollutant:", ["PM2.5", "PM10", "AQI", "CO2", "VOC", "Temperature", "Humidity"], key='pollutant')
     
-    
+    st.markdown('<hr style="border:1px solid black">', unsafe_allow_html=True)
+
     # Map display names to database column names
     pollutant_map = {
         "PM2.5": "pm25",
