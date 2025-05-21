@@ -2126,12 +2126,15 @@ elif st.session_state.script_choice == 'device_data_comparison':
     
     st.markdown('<hr style="border:1px solid black">', unsafe_allow_html=True)
     
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
     with col1:
         start_date = st.date_input("Start Date",value= datetime(2024, 1, 1))
     
     with col2:
         end_date = st.date_input("End Date", value = datetime(2024, 12, 31))
+    
+    with col3:
+        pollutant = st.selectbox("Select Pollutant", options=["pm25", "pm10", "aqi"], index=0)
 
     st.markdown('<hr style="border:1px solid black">', unsafe_allow_html=True)
 
