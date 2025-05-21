@@ -2070,9 +2070,9 @@ if st.session_state.script_choice == "monthly_trends":
                         conn.close()
 
 
-st.markdown('<hr style="border:1px solid black">', unsafe_allow_html=True)
+    st.markdown('<hr style="border:1px solid black">', unsafe_allow_html=True)
 
-elif st.session_state.script_choice == "device_data_comparison":
+elif st.session_state.script_choice == 'device_data_comparison':
     st.header('Device Data Comparison')
     st.write("This section will allow you to compare dat between different devices.")
 
