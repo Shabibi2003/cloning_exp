@@ -88,7 +88,7 @@ with col5:
     if st.button('Monthly Trends'):
         st.session_state.script_choice = "monthly_trends"
 with col6:
-    if st.button('Device Data Comparison'):
+    if st.button('Device Comparison'):
         st.session_state.script_choice = 'device_data_comparison'
 # Set the default selected date to one day before the current date
 default_date = datetime.now() - timedelta(days=1)
