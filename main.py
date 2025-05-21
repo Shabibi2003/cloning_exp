@@ -2148,9 +2148,12 @@ elif st.session_state.script_choice == 'device_data_comparison':
         "Temperature": "temp",
         "Humidity": "humidity"
     }
-    
+    host = "139.59.34.149"
+    user = "neemdb"
+    password = "(#&pxJ&p7JvhA7<B"
+    database = "cabh_iaq_db"
     # Button to generate comparison
-    if st.button("Generate Comparison"):
+    if st.button("Generate Charts"):
         with st.spinner("Generating comparison...please wait"):
             try:
                 # Connect to the MySQL database
