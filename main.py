@@ -2076,20 +2076,54 @@ elif st.session_state.script_choice == 'device_data_comparison':
     st.header('Device Data Comparison')
     st.write("This section will allow you to compare data between different devices.")
     
+    # Define device data dictionary with device IDs and their information
+    device_data = {
+        '1203240077': ('Gurneet Mannat Room', 'Residential'),
+        '1203240076': ('Gurneet Prabhash Room', 'Residential'),
+        '1201240079': ('Piyush Bedroom', 'Residential'),
+        '1201240085': ('Piyush Living Room', 'Residential'),
+        '1203240083': ('Sheetal Living Room', 'Residential'),
+        '1201240072': ('Lakshmi Living Room', 'Residential'),
+        '1201240077': ('Lakshmi Kitchen', 'Residential'),
+        '1202240027': ('Mariyam Bedroom 1', 'Residential'),
+        '1202240011': ('Mariyam Living Room', 'Residential'),
+        '1201240074': ('Abhishek Living Room', 'Residential'),
+        '1203240080': ('Abhishek Bedroom', 'Residential'),
+        '1212230160': ('Surender Bedroom', 'Residential'),
+        '1201240076': ('Surender Living Room', 'Residential'),
+        '1202240009': ('Robin Bedroom', 'Residential'),
+        '1202240008': ('Robin Living Room', 'Residential'),
+        '1201240075': ('Hines Office 1', 'Office'),
+        '1201240078': ('Hines Office 2', 'Office'),
+        '1202240025': ('EDS D Block 1', 'Office'),
+        '1202240026': ('EDS D Block 2', 'Office'),
+        '1203240073': ('Nidhi Bedroom', 'Residential'),
+        '1203240072': ('Manpreet Drawing', 'Residential')
+    }
+    
     # Create columns for device selection
     col1, col2, col3 = st.columns(3)
     
-    # Get the list of device IDs from device_data dictionary
+    # Get the list of device IDs
     device_id_list = list(device_data.keys())
     
     with col1:
         device_id_1 = st.selectbox("Select First Device ID:", options=sorted(device_id_list), index=0, key='device_1')
+        if device_id_1:
+            st.write(f"Location: {device_data[device_id_1][0]}")
+            st.write(f"Type: {device_data[device_id_1][1]}")
     
     with col2:
         device_id_2 = st.selectbox("Select Second Device ID:", options=sorted(device_id_list), index=0, key='device_2')
+        if device_id_2:
+            st.write(f"Location: {device_data[device_id_2][0]}")
+            st.write(f"Type: {device_data[device_id_2][1]}")
     
     with col3:
         device_id_3 = st.selectbox("Select Third Device ID:", options=sorted(device_id_list), index=0, key='device_3')
+        if device_id_3:
+            st.write(f"Location: {device_data[device_id_3][0]}")
+            st.write(f"Type: {device_data[device_id_3][1]}")
     
     st.markdown('<hr style="border:1px solid black">', unsafe_allow_html=True)
 
