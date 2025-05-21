@@ -2104,28 +2104,31 @@ elif st.session_state.script_choice == 'device_data_comparison':
     location_to_device = {info[0]: device_id for device_id, info in device_data.items()}
     
     # Get list of locations
-    locations = sorted(location_to_device.keys())
+    locations = ['None'] + sorted(location_to_device.keys())
     
     # Create columns for device selection
     col1, col2, col3 = st.columns(3)
     
     with col1:
         location_1 = st.selectbox("Select First Location:", options=locations, index=0, key='location_1')
-        device_id_1 = location_to_device[location_1]
-        st.write(f"Device ID: {device_id_1}")
-        st.write(f"Type: {device_data[device_id_1][1]}")
+        if location_1 != 'None':
+            device_id_1 = location_to_device[location_1]
+            st.write(f"Device ID: {device_id_1}")
+            st.write(f"Type: {device_data[device_id_1][1]}")
     
     with col2:
         location_2 = st.selectbox("Select Second Location:", options=locations, index=0, key='location_2')
-        device_id_2 = location_to_device[location_2]
-        st.write(f"Device ID: {device_id_2}")
-        st.write(f"Type: {device_data[device_id_2][1]}")
+        if location_2 != 'None':
+            device_id_2 = location_to_device[location_2]
+            st.write(f"Device ID: {device_id_2}")
+            st.write(f"Type: {device_data[device_id_2][1]}")
     
     with col3:
         location_3 = st.selectbox("Select Third Location:", options=locations, index=0, key='location_3')
-        device_id_3 = location_to_device[location_3]
-        st.write(f"Device ID: {device_id_3}")
-        st.write(f"Type: {device_data[device_id_3][1]}")
+        if location_3 != 'None':
+            device_id_3 = location_to_device[location_3]
+            st.write(f"Device ID: {device_id_3}")
+            st.write(f"Type: {device_data[device_id_3][1]}")
     
     # Add date range selection
     col1, col2, col3 = st.columns(3)
@@ -2155,10 +2158,11 @@ elif st.session_state.script_choice == 'device_data_comparison':
     database = "cabh_iaq_db"
     # Button to generate comparison
     if st.button("Generate Charts"):
-        # Check if at least one unique location is selected
-        selected_locations = set([location_1, location_2, location_3])
-        if len(selected_locations) < 1:
-            st.error("Please select at least one unique location")
+        # Get selected locations (excluding 'None')
+        selected_locations = [loc for loc in [location_1, location_2, location_3] if loc != 'None']
+        
+        if not selected_locations:
+            st.error("Please select at least one location")
         else:
             with st.spinner("Generating comparison...please wait"):
                 try:
@@ -2174,12 +2178,14 @@ elif st.session_state.script_choice == 'device_data_comparison':
                     # Create a figure for the comparison
                     fig = go.Figure()
                     
-                    # Create a list of unique device IDs and their colors
-                    device_colors = [
-                        (device_id_1, 'blue', location_1),
-                        (device_id_2, 'red', location_2),
-                        (device_id_3, 'green', location_3)
-                    ]
+                    # Create a list of device IDs and their colors for selected locations
+                    device_colors = []
+                    if location_1 != 'None':
+                        device_colors.append((location_to_device[location_1], 'blue', location_1))
+                    if location_2 != 'None':
+                        device_colors.append((location_to_device[location_2], 'red', location_2))
+                    if location_3 != 'None':
+                        device_colors.append((location_to_device[location_3], 'green', location_3))
                     
                     # Only process unique locations
                     processed_locations = set()
