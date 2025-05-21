@@ -87,9 +87,6 @@ with col4:
 with col5:
     if st.button('Monthly Trends'):
         st.session_state.script_choice = "monthly_trends"
-with col5:
-    if st.button('Comparison'):
-        st.session_state.script_choice = "Comparison"
 
 # Set the default selected date to one day before the current date
 default_date = datetime.now() - timedelta(days=1)
@@ -1406,18 +1403,6 @@ if st.session_state.script_choice == "monthly_trends":
     import io
     from io import BytesIO
     from PIL import Image
-
-    def create_pdf_from_figs(fig_dict):
-        pdf_buffer = BytesIO()
-        with PdfPages(pdf_buffer) as pdf:
-            for fig in fig_dict.values():
-                pdf.savefig(fig, bbox_inches='tight')
-        pdf_buffer.seek(0)
-        return pdf_buffer
-
-# Add another section button for "Comparison"
-if st.session_state.script_choice == "Comparison":
-    st.write('HI')
 
 
     def create_pdf_from_figs(fig_dict):
