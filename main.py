@@ -2074,7 +2074,6 @@ if st.session_state.script_choice == "monthly_trends":
 
 elif st.session_state.script_choice == 'device_data_comparison':
     st.header('Device Data Comparison')
-    st.write("This section will allow you to compare data between different devices.")
     
     # Define device data dictionary with device IDs and their information
     device_data = {
@@ -2125,6 +2124,15 @@ elif st.session_state.script_choice == 'device_data_comparison':
             st.write(f"Location: {device_data[device_id_3][0]}")
             st.write(f"Type: {device_data[device_id_3][1]}")
     
+    st.markdown('<hr style="border:1px solid black">', unsafe_allow_html=True)
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        start_date = st.date_input("Start Date",value= datetime(2024, 1, 1))
+    
+    with col2:
+        end_date = st.date_input("End Date", value = datetime(2024, 12, 31))
+
     st.markdown('<hr style="border:1px solid black">', unsafe_allow_html=True)
 
 st.markdown(
