@@ -1,4 +1,5 @@
 import pandas as pd
+from referencing.jsonschema import UnknownDialect
 import streamlit as st
 import plotly.graph_objects as go
 import mysql.connector
@@ -2074,7 +2075,8 @@ if st.session_state.script_choice == "monthly_trends":
 
 elif st.session_state.script_choice == 'device_data_comparison':
     st.header('Device Data Comparison')
-    
+    st.markdown("<br>", unsafe_allow_html=True)
+
     # Define device data dictionary with device IDs and their information
     device_data = {
         '1203240077': ('Gurneet Mannat Room', 'Residential'),
