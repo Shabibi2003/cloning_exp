@@ -2073,8 +2073,7 @@ if st.session_state.script_choice == "monthly_trends":
     st.markdown('<hr style="border:1px solid black">', unsafe_allow_html=True)
 
 elif st.session_state.script_choice == 'device_data_comparison':
-    st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown('<h3>Device Data Comparison</h3>', unsafe_allow_html=True)
+    st.header('Device Data Comparison')
     st.write("This section will allow you to compare data between different devices.")
     
     # Define device data dictionary with device IDs and their information
@@ -2102,29 +2101,32 @@ elif st.session_state.script_choice == 'device_data_comparison':
         '1203240072': ('Manpreet Drawing', 'Residential')
     }
     
+    # Create reverse mapping from location to device ID
+    location_to_device = {info[0]: device_id for device_id, info in device_data.items()}
+    
+    # Get list of locations
+    locations = sorted(location_to_device.keys())
+    
     # Create columns for device selection
     col1, col2, col3 = st.columns(3)
     
-    # Get the list of device IDs
-    device_id_list = list(device_data.keys())
-    
     with col1:
-        device_id_1 = st.selectbox("Select First Device ID:", options=sorted(device_id_list), index=0, key='device_1')
-        if device_id_1:
-            st.write(f"Location: {device_data[device_id_1][0]}")
-            st.write(f"Type: {device_data[device_id_1][1]}")
+        location_1 = st.selectbox("Select First Location:", options=locations, index=0, key='location_1')
+        device_id_1 = location_to_device[location_1]
+        st.write(f"Device ID: {device_id_1}")
+        st.write(f"Type: {device_data[device_id_1][1]}")
     
     with col2:
-        device_id_2 = st.selectbox("Select Second Device ID:", options=sorted(device_id_list), index=0, key='device_2')
-        if device_id_2:
-            st.write(f"Location: {device_data[device_id_2][0]}")
-            st.write(f"Type: {device_data[device_id_2][1]}")
+        location_2 = st.selectbox("Select Second Location:", options=locations, index=0, key='location_2')
+        device_id_2 = location_to_device[location_2]
+        st.write(f"Device ID: {device_id_2}")
+        st.write(f"Type: {device_data[device_id_2][1]}")
     
     with col3:
-        device_id_3 = st.selectbox("Select Third Device ID:", options=sorted(device_id_list), index=0, key='device_3')
-        if device_id_3:
-            st.write(f"Location: {device_data[device_id_3][0]}")
-            st.write(f"Type: {device_data[device_id_3][1]}")
+        location_3 = st.selectbox("Select Third Location:", options=locations, index=0, key='location_3')
+        device_id_3 = location_to_device[location_3]
+        st.write(f"Device ID: {device_id_3}")
+        st.write(f"Type: {device_data[device_id_3][1]}")
     
     # Add date range selection
     col1, col2, col3 = st.columns(3)
