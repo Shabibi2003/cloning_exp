@@ -2074,7 +2074,24 @@ if st.session_state.script_choice == "monthly_trends":
 
 elif st.session_state.script_choice == 'device_data_comparison':
     st.header('Device Data Comparison')
-    st.write("This section will allow you to compare dat between different devices.")
+    st.write("This section will allow you to compare data between different devices.")
+    
+    # Create columns for device selection
+    col1, col2, col3 = st.columns(3)
+    
+    # Get the list of device IDs from device_data dictionary
+    device_id_list = list(device_data.keys())
+    
+    with col1:
+        device_id_1 = st.selectbox("Select First Device ID:", options=sorted(device_id_list), index=0, key='device_1')
+    
+    with col2:
+        device_id_2 = st.selectbox("Select Second Device ID:", options=sorted(device_id_list), index=0, key='device_2')
+    
+    with col3:
+        device_id_3 = st.selectbox("Select Third Device ID:", options=sorted(device_id_list), index=0, key='device_3')
+    
+    st.markdown('<hr style="border:1px solid black">', unsafe_allow_html=True)
 
 st.markdown(
     """
