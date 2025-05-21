@@ -2073,7 +2073,8 @@ if st.session_state.script_choice == "monthly_trends":
     st.markdown('<hr style="border:1px solid black">', unsafe_allow_html=True)
 
 elif st.session_state.script_choice == 'device_data_comparison':
-    st.header('Device Data Comparison')
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown('<h3>Device Data Comparison</h3>', unsafe_allow_html=True)
     st.write("This section will allow you to compare data between different devices.")
     
     # Define device data dictionary with device IDs and their information
