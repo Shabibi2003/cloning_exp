@@ -2074,6 +2074,7 @@ if st.session_state.script_choice == "monthly_trends":
 
 elif st.session_state.script_choice == 'device_data_comparison':
     st.header('Device Data Comparison')
+    st.write("This section will allow you to compare data between different devices.")
     
     # Define device data dictionary with device IDs and their information
     device_data = {
@@ -2126,16 +2127,95 @@ elif st.session_state.script_choice == 'device_data_comparison':
     
     st.markdown('<hr style="border:1px solid black">', unsafe_allow_html=True)
     
+    # Add date range selection
     col1, col2, col3 = st.columns(3)
     with col1:
-        start_date = st.date_input("Start Date",value= datetime(2024, 1, 1))
-    
+        start_date = st.date_input("Start Date", value=datetime(2024, 4, 1))
     with col2:
-        end_date = st.date_input("End Date", value = datetime(2024, 12, 31))
-    
-    with col3:
-        pollutant = st.selectbox("Select Pollutant", options=["pm25", "pm10", "aqi"], index=0)
+        end_date = st.date_input("End Date", value=datetime(2024, 4, 30))
 
+    with col3:
+        pollutant = st.selectbox("Select Pollutant:", ["PM2.5", "PM10", "AQI", "CO2", "VOC", "Temperature", "Humidity"], key='pollutant')
+    
+    
+    # Map display names to database column names
+    pollutant_map = {
+        "PM2.5": "pm25",
+        "PM10": "pm10",
+        "AQI": "aqi",
+        "CO2": "co2",
+        "VOC": "voc",
+        "Temperature": "temp",
+        "Humidity": "humidity"
+    }
+    
+    # Button to generate comparison
+    if st.button("Generate Comparison"):
+        with st.spinner("Generating comparison...please wait"):
+            try:
+                # Connect to the MySQL database
+                conn = mysql.connector.connect(
+                    host=host,
+                    user=user,
+                    password=password,
+                    database=database
+                )
+                cursor = conn.cursor()
+                
+                # Create a figure for the comparison
+                fig = go.Figure()
+                
+                # Fetch and plot data for each device
+                for device_id, color in [(device_id_1, 'blue'), (device_id_2, 'red'), (device_id_3, 'green')]:
+                    # Query to fetch data for the selected date range
+                    query = """
+                    SELECT datetime, {}
+                    FROM reading_db
+                    WHERE deviceID = %s 
+                    AND DATE(datetime) BETWEEN %s AND %s;
+                    """.format(pollutant_map[pollutant])
+                    
+                    cursor.execute(query, (device_id, start_date, end_date))
+                    rows = cursor.fetchall()
+                    
+                    if rows:
+                        # Process data
+                        df = pd.DataFrame(rows, columns=["datetime", pollutant_map[pollutant]])
+                        df['datetime'] = pd.to_datetime(df['datetime'])
+                        df.set_index('datetime', inplace=True)
+                        
+                        # Remove zeros and resample to hourly averages
+                        df = df[df[pollutant_map[pollutant]] != 0]
+                        df = df.resample('H').mean()
+                        
+                        # Add trace to the figure
+                        fig.add_trace(go.Scatter(
+                            x=df.index,
+                            y=df[pollutant_map[pollutant]],
+                            name=f"{device_data[device_id][0]}",
+                            line=dict(color=color)
+                        ))
+                
+                # Update layout
+                fig.update_layout(
+                    title=f"{pollutant} Comparison",
+                    xaxis_title="Time",
+                    yaxis_title=pollutant,
+                    height=600
+                )
+                
+                # Display the plot
+                st.plotly_chart(fig, use_container_width=True)
+                
+            except mysql.connector.Error as e:
+                st.error(f"Database error: {e}")
+            except Exception as e:
+                st.error(f"An unexpected error occurred: {e}")
+            finally:
+                if 'conn' in locals() and conn.is_connected():
+                    cursor.close()
+                    conn.close()
+    
     st.markdown('<hr style="border:1px solid black">', unsafe_allow_html=True)
 
 st.markdown(
