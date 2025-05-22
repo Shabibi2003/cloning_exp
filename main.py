@@ -2080,8 +2080,8 @@ elif st.session_state.script_choice == 'device_data_comparison':
 
     # Define device data dictionary with device IDs and their information
     device_data = {
-        '1203240077': ('Gurneet Mannat Room', 'Residential'),
-        '1203240076': ('Gurneet Prabhansh Room', 'Residential'),
+        '1203240077': ('Gurneet  Bedroom', 'Residential'),
+        '1203240076': ('Hisham Living Room', 'Residential'),
         '1201240079': ('Piyush Bedroom', 'Residential'),
         '1201240085': ('Piyush Living Room', 'Residential'),
         '1203240083': ('Sheetal Living Room', 'Residential'),
@@ -2100,7 +2100,18 @@ elif st.session_state.script_choice == 'device_data_comparison':
         '1202240025': ('EDS D Block 1', 'Office'),
         '1202240026': ('EDS D Block 2', 'Office'),
         '1203240073': ('Nidhi Bedroom', 'Residential'),
-        '1203240072': ('Manpreet Drawing', 'Residential')
+        '1203240081': ('EDS E Block', 'Office'),
+        '1203240078': ('Hisham Bedroom', 'Residential'),
+        '1203240075': ('Shahzeb Kitchen', 'Residential'),
+        '1203240079': ('Piyush Living Room Prince Apart.', 'Residential'),
+        '1203240074': ('Ashish Living Room', 'Residential'),
+        '1201240073': ('Tanmay Tathagat', 'Residential'),
+        '1203240082': ('Gurneet Prabhansh Room', 'Residential'),
+        '1202240029': ("St. Mary's School", 'Office'),
+        '1202240028': ('St. Marys School', 'Office'),
+        '1202240010': ('St. Marys School', 'Office'),
+        '1202240012': ('St. Marys School', 'Office')
+
     }
     
     # Create reverse mapping from location to device ID
