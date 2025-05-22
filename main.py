@@ -1905,7 +1905,7 @@ if st.session_state.script_choice == "monthly_trends":
         # Display address and typology
     st.write(f"Address: {device_info[0]}")
     st.write(f"Typology: {device_info[1]}")
-    st.write(f"Device Holder Name: {device_info[2]}")
+    st.write(f"Device Location: {device_info[2]}")
 
     st.markdown('<div class="black-line"></div>', unsafe_allow_html=True)
 
