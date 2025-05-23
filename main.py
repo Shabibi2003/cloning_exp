@@ -2199,7 +2199,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
                     # Create a list of device IDs and their colors for selected locations
                     device_colors = []
                     if location_1 != 'None':
-                        device_colors.append((location_to_device[location_1], 'blue', location_1))
+                        device_colors.append((location_to_device[location_1], 'yellow', location_1))
                     if location_2 != 'None':
                         device_colors.append((location_to_device[location_2], 'red', location_2))
                     if location_3 != 'None':
