@@ -1462,7 +1462,7 @@ if st.session_state.script_choice == "monthly_trends":
         "1203240075", "1201240077", "1201240072", "1203240079", "1201240079",
         "1201240085", "1203240083", "1203240073", "1203240074", "1201240076",
         "1212230160", "1201240073", "1203240080", "1201240074","1202240011",
-        "1202240027", "1203240076", "1203240078", "1203240075", "1203240079",
+        "1202240027", "1203240076", "1203240078", "1203240079"
     ]
 
     # Mapping of indoor device IDs to outdoor device IDs
@@ -2189,8 +2189,12 @@ elif st.session_state.script_choice == 'device_data_comparison':
                     )
                     cursor = conn.cursor()
                     
-                    # Create a figure for the comparison
-                    fig = go.Figure()
+                    # Create figures for both hourly and minute-by-minute comparisons
+                    fig_hourly = go.Figure()
+                    fig_minute = go.Figure()
+                    
+                    # Store DataFrames for download
+                    dfs = []
                     
                     # Create a list of device IDs and their colors for selected locations
                     device_colors = []
@@ -2228,28 +2232,65 @@ elif st.session_state.script_choice == 'device_data_comparison':
                             df['datetime'] = pd.to_datetime(df['datetime'])
                             df.set_index('datetime', inplace=True)
                             
-                            # Remove zeros and resample to hourly averages
+                            # Remove zeros
                             df = df[df[pollutant_map[pollutant]] != 0]
-                            df = df.resample('H').mean()
                             
-                            # Add trace to the figure
-                            fig.add_trace(go.Scatter(
+                            # Store original minute data for download
+                            df_download = df.copy()
+                            df_download['location'] = location
+                            df_download['device_id'] = device_id
+                            dfs.append(df_download)
+                            
+                            # Create hourly averages for first chart
+                            df_hourly = df.resample('H').mean()
+                            
+                            # Add traces to both figures
+                            fig_hourly.add_trace(go.Scatter(
+                                x=df_hourly.index,
+                                y=df_hourly[pollutant_map[pollutant]],
+                                name=f"{location} (Hourly)",
+                                line=dict(color=color)
+                            ))
+                            
+                            fig_minute.add_trace(go.Scatter(
                                 x=df.index,
                                 y=df[pollutant_map[pollutant]],
-                                name=f"{device_data[device_id][0]}",
+                                name=f"{location} (Minute)",
                                 line=dict(color=color)
                             ))
                     
-                    # Update layout
-                    fig.update_layout(
-                        title=f"{pollutant} Comparison",
+                    # Update layouts
+                    fig_hourly.update_layout(
+                        title=f"{pollutant} Comparison (Hourly Averages)",
                         xaxis_title="Date",
                         yaxis_title=pollutant,
-                        height=600
+                        height=500
                     )
                     
-                    # Display the plot
-                    st.plotly_chart(fig, use_container_width=True)
+                    fig_minute.update_layout(
+                        title=f"{pollutant} Comparison (Minute-by-Minute)",
+                        xaxis_title="Date",
+                        yaxis_title=pollutant,
+                        height=500
+                    )
+                    
+                    # Display both plots
+                    st.plotly_chart(fig_hourly, use_container_width=True)
+                    st.markdown('<hr style="border:1px solid black">', unsafe_allow_html=True)
+                    st.plotly_chart(fig_minute, use_container_width=True)
+                    
+                    if dfs:
+                        # Combine all DataFrames
+                        combined_df = pd.concat(dfs, axis=0)
+                        
+                        # Create a download button for the CSV
+                        csv = combined_df.to_csv(index=False)
+                        st.download_button(
+                            label="Download Data",
+                            data=csv,
+                            file_name=f"device_comparison_{pollutant}_{start_date}_{end_date}.csv",
+                            mime="text/csv"
+                        )
                     
                 except mysql.connector.Error as e:
                     st.error(f"Database error: {e}")
