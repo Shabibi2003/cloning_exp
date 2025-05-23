@@ -2284,13 +2284,13 @@ elif st.session_state.script_choice == 'device_data_comparison':
                         combined_df = pd.concat(dfs, axis=0)
                         
                         # Create a download button for the CSV
-                        csv = combined_df.to_csv(index=False)
-                        st.download_button(
-                            label="Download Data",
-                            data=csv,
-                            file_name=f"device_comparison_{pollutant}_{start_date}_{end_date}.csv",
-                            mime="text/csv"
-                        )
+                        # csv = combined_df.to_csv(index=False)
+                        # st.download_button(
+                        #     label="Download Data",
+                        #     data=csv,
+                        #     file_name=f"device_comparison_{pollutant}_{start_date}_{end_date}.csv",
+                        #     mime="text/csv"
+                        # )
                     
                 except mysql.connector.Error as e:
                     st.error(f"Database error: {e}")
