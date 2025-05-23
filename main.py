@@ -2193,9 +2193,6 @@ elif st.session_state.script_choice == 'device_data_comparison':
                     fig_hourly = go.Figure()
                     fig_minute = go.Figure()
                     
-                    # Store DataFrames for download
-                    # dfs = []
-                    
                     # Create a list of device IDs and their colors for selected locations
                     device_colors = []
                     if location_1 != 'None':
@@ -2235,14 +2232,8 @@ elif st.session_state.script_choice == 'device_data_comparison':
                             # Remove zeros
                             df = df[df[pollutant_map[pollutant]] != 0]
                             
-                            # Store original minute data for download
-                            # df_download = df.copy()
-                            # df_download['location'] = location
-                            # df_download['device_id'] = device_id
-                            # dfs.append(df_download)
-                            
                             # Create hourly averages for first chart
-                            df_hourly = df.resample('h').mean()
+                            df_hourly = df.resample('H').mean()
                             
                             # Add traces to both figures
                             fig_hourly.add_trace(go.Scatter(
@@ -2278,19 +2269,6 @@ elif st.session_state.script_choice == 'device_data_comparison':
                     st.plotly_chart(fig_hourly, use_container_width=True)
                     st.markdown('<hr style="border:1px solid black">', unsafe_allow_html=True)
                     st.plotly_chart(fig_minute, use_container_width=True)
-                    
-                    # if dfs:
-                    #     # Combine all DataFrames
-                    #     combined_df = pd.concat(dfs, axis=0)
-                        
-                        # Create a download button for the CSV
-                        # csv = combined_df.to_csv(index=False)
-                        # st.download_button(
-                        #     label="Download Data",
-                        #     data=csv,
-                        #     file_name=f"device_comparison_{pollutant}_{start_date}_{end_date}.csv",
-                        #     mime="text/csv"
-                        # )
                     
                 except mysql.connector.Error as e:
                     st.error(f"Database error: {e}")
