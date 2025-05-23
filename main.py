@@ -2268,6 +2268,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                 else:
                                     st.warning(f"No valid hourly data for {location} after resampling")
                             else:
+                                st.info("Details of Minute by Minute Data")
                                 st.warning(f"No valid data points for {location} after filtering zeros")
                         else:
                             st.warning(f"No data found for {location} in the selected date range")
