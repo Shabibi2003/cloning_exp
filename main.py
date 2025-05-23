@@ -2193,6 +2193,9 @@ elif st.session_state.script_choice == 'device_data_comparison':
                     fig_hourly = go.Figure()
                     fig_minute = go.Figure()
                     
+                    # Debug counter for data processing
+                    data_processed = 0
+                    
                     # Create a list of device IDs and their colors for selected locations
                     device_colors = []
                     if location_1 != 'None':
@@ -2217,58 +2220,80 @@ elif st.session_state.script_choice == 'device_data_comparison':
                         SELECT datetime, {}
                         FROM reading_db
                         WHERE deviceID = %s 
-                        AND DATE(datetime) BETWEEN %s AND %s;
+                        AND DATE(datetime) BETWEEN %s AND %s
+                        ORDER BY datetime;
                         """.format(pollutant_map[pollutant])
                         
                         cursor.execute(query, (device_id, start_date, end_date))
                         rows = cursor.fetchall()
                         
+                        # Debug print
+                        st.write(f"Found {len(rows)} data points for {location}")
+                        
                         if rows:
                             # Process data
                             df = pd.DataFrame(rows, columns=["datetime", pollutant_map[pollutant]])
                             df['datetime'] = pd.to_datetime(df['datetime'])
-                            df.set_index('datetime', inplace=True)
                             
-                            # Remove zeros
+                            # Debug print
+                            st.write(f"Data range for {location}: {df['datetime'].min()} to {df['datetime'].max()}")
+                            
+                            # Remove zeros and null values
+                            df = df[df[pollutant_map[pollutant]].notna()]
                             df = df[df[pollutant_map[pollutant]] != 0]
                             
-                            # Create hourly averages for first chart
-                            df_hourly = df.resample('H').mean()
-                            
-                            # Add traces to both figures
-                            fig_hourly.add_trace(go.Scatter(
-                                x=df_hourly.index,
-                                y=df_hourly[pollutant_map[pollutant]],
-                                name=f"{location} (Hourly)",
-                                line=dict(color=color)
-                            ))
-                            
-                            fig_minute.add_trace(go.Scatter(
-                                x=df.index,
-                                y=df[pollutant_map[pollutant]],
-                                name=f"{location} (Minute)",
-                                line=dict(color=color)
-                            ))
+                            if not df.empty:
+                                df.set_index('datetime', inplace=True)
+                                
+                                # Create hourly averages for first chart
+                                df_hourly = df.resample('H').mean().dropna()
+                                
+                                if not df_hourly.empty:
+                                    # Add traces to both figures
+                                    fig_hourly.add_trace(go.Scatter(
+                                        x=df_hourly.index,
+                                        y=df_hourly[pollutant_map[pollutant]],
+                                        name=f"{location} (Hourly)",
+                                        line=dict(color=color)
+                                    ))
+                                    
+                                    fig_minute.add_trace(go.Scatter(
+                                        x=df.index,
+                                        y=df[pollutant_map[pollutant]],
+                                        name=f"{location} (Minute)",
+                                        line=dict(color=color)
+                                    ))
+                                    
+                                    data_processed += 1
+                                else:
+                                    st.warning(f"No valid hourly data for {location} after resampling")
+                            else:
+                                st.warning(f"No valid data points for {location} after filtering zeros")
+                        else:
+                            st.warning(f"No data found for {location} in the selected date range")
                     
-                    # Update layouts
-                    fig_hourly.update_layout(
-                        title=f"{pollutant} Comparison (Hourly Averages)",
-                        xaxis_title="Date",
-                        yaxis_title=pollutant,
-                        height=500
-                    )
-                    
-                    fig_minute.update_layout(
-                        title=f"{pollutant} Comparison (Minute-by-Minute)",
-                        xaxis_title="Date",
-                        yaxis_title=pollutant,
-                        height=500
-                    )
-                    
-                    # Display both plots
-                    st.plotly_chart(fig_hourly, use_container_width=True)
-                    st.markdown('<hr style="border:1px solid black">', unsafe_allow_html=True)
-                    st.plotly_chart(fig_minute, use_container_width=True)
+                    if data_processed > 0:
+                        # Update layouts
+                        fig_hourly.update_layout(
+                            title=f"{pollutant} Comparison (Hourly Averages)",
+                            xaxis_title="Date",
+                            yaxis_title=pollutant,
+                            height=500
+                        )
+                        
+                        fig_minute.update_layout(
+                            title=f"{pollutant} Comparison (Minute-by-Minute)",
+                            xaxis_title="Date",
+                            yaxis_title=pollutant,
+                            height=500
+                        )
+                        
+                        # Display both plots
+                        st.plotly_chart(fig_hourly, use_container_width=True)
+                        st.markdown('<hr style="border:1px solid black">', unsafe_allow_html=True)
+                        st.plotly_chart(fig_minute, use_container_width=True)
+                    else:
+                        st.error("No valid data available for plotting. Please check your selection.")
                     
                 except mysql.connector.Error as e:
                     st.error(f"Database error: {e}")
