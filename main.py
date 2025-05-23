@@ -2194,7 +2194,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
                     fig_minute = go.Figure()
                     
                     # Store DataFrames for download
-                    dfs = []
+                    # dfs = []
                     
                     # Create a list of device IDs and their colors for selected locations
                     device_colors = []
@@ -2236,13 +2236,13 @@ elif st.session_state.script_choice == 'device_data_comparison':
                             df = df[df[pollutant_map[pollutant]] != 0]
                             
                             # Store original minute data for download
-                            df_download = df.copy()
-                            df_download['location'] = location
-                            df_download['device_id'] = device_id
-                            dfs.append(df_download)
+                            # df_download = df.copy()
+                            # df_download['location'] = location
+                            # df_download['device_id'] = device_id
+                            # dfs.append(df_download)
                             
                             # Create hourly averages for first chart
-                            df_hourly = df.resample('H').mean()
+                            df_hourly = df.resample('h').mean()
                             
                             # Add traces to both figures
                             fig_hourly.add_trace(go.Scatter(
@@ -2279,9 +2279,9 @@ elif st.session_state.script_choice == 'device_data_comparison':
                     st.markdown('<hr style="border:1px solid black">', unsafe_allow_html=True)
                     st.plotly_chart(fig_minute, use_container_width=True)
                     
-                    if dfs:
-                        # Combine all DataFrames
-                        combined_df = pd.concat(dfs, axis=0)
+                    # if dfs:
+                    #     # Combine all DataFrames
+                    #     combined_df = pd.concat(dfs, axis=0)
                         
                         # Create a download button for the CSV
                         # csv = combined_df.to_csv(index=False)
