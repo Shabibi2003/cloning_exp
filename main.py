@@ -2233,7 +2233,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
                             df = df[df[pollutant_map[pollutant]] != 0]
                             
                             # Create hourly averages for first chart
-                            df_hourly = df.resample('H').mean()
+                            df_hourly = df.resample('h').mean()
                             
                             # Add traces to both figures
                             fig_hourly.add_trace(go.Scatter(
