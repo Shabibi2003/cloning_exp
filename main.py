@@ -2228,6 +2228,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
                         rows = cursor.fetchall()
                         
                         # Debug print
+                        st.write("Short Analysis for minute by minute data:")
                         st.write(f"Found {len(rows)} data points for {location}")
                         
                         if rows:
