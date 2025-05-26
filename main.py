@@ -2270,6 +2270,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                     
                                     # generate minute by minute line chart if the input months are in range of 11 months 
                                     if (end_date - start_date).days <= 330:
+                                        st.write('The input months should be in range of 11 months for minute by minute chart')
                                         fig_minute.add_trace(go.Scatter(
                                             x=df.index,
                                             y=df[pollutant_map[pollutant]],
