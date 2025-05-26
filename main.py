@@ -2209,27 +2209,28 @@ elif st.session_state.script_choice == 'device_data_comparison':
                     processed_locations = set()
                     
                     # Check date range condition once before processing devices
-                    if (end_date - start_date).days > 335:
-                        st.markdown('<h3 style="bold"> The Input months should be within an 11 month range to generate a minute by minute chart</h3>', unsafe_allow_html=True)
-                    else:
-                        # Fetch and plot data for each unique device
-                        for device_id, color, location in device_colors:
-                            if location in processed_locations:
-                                continue
-                                
-                            processed_locations.add(location)
+                    is_long_range = (end_date - start_date).days > 335
+                    if is_long_range:
+                        st.markdown('<h3 style="bold">Showing hourly data only - the selected range exceeds 11 months</h3>', unsafe_allow_html=True)
+                    
+                    # Fetch and plot data for each unique device
+                    for device_id, color, location in device_colors:
+                        if location in processed_locations:
+                            continue
                             
-                            # Query to fetch data for the selected date range
-                            query = """
-                            SELECT datetime, {}
-                            FROM reading_db
-                            WHERE deviceID = %s 
-                            AND DATE(datetime) BETWEEN %s AND %s
-                            ORDER BY datetime;
-                            """.format(pollutant_map[pollutant])
-                            
-                            cursor.execute(query, (device_id, start_date, end_date))
-                            rows = cursor.fetchall()
+                        processed_locations.add(location)
+                        
+                        # Query to fetch data for the selected date range
+                        query = """
+                        SELECT datetime, {}
+                        FROM reading_db
+                        WHERE deviceID = %s 
+                        AND DATE(datetime) BETWEEN %s AND %s
+                        ORDER BY datetime;
+                        """.format(pollutant_map[pollutant])
+                        
+                        cursor.execute(query, (device_id, start_date, end_date))
+                        rows = cursor.fetchall()
                         
                         # Debug print
                         st.write(f"Short Analysis for Minute by Minute Data")
@@ -2264,7 +2265,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                 
                                 
                                 if not df_hourly.empty:
-                                    # Add traces to both figures
+                                    # Add traces to hourly figure
                                     fig_hourly.add_trace(go.Scatter(
                                         x=df_hourly.index,
                                         y=df_hourly[pollutant_map[pollutant]],
@@ -2272,13 +2273,14 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                         line=dict(color=color)
                                     ))
                                     
-                                    # Add traces to minute figure without checking date range again
-                                    fig_minute.add_trace(go.Scatter(
-                                        x=df.index,
-                                        y=df[pollutant_map[pollutant]],
-                                        name=f"{location} (Minute)",
-                                        line=dict(color=color)
-                                    ))
+                                    # Only add minute data if within range
+                                    if not is_long_range:
+                                        fig_minute.add_trace(go.Scatter(
+                                            x=df.index,
+                                            y=df[pollutant_map[pollutant]],
+                                            name=f"{location} (Minute)",
+                                            line=dict(color=color)
+                                        ))
                                     
                                     data_processed += 1
                                 else:
