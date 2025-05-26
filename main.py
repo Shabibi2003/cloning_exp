@@ -2277,7 +2277,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                             line=dict(color=color)
                                         ))
                                     else:
-                                        st.markdown('<h3 style='bold'> The input months should be in range of 11 months for minute by minute chart</h3>', unsafe_allow_html=True)
+                                        st.markdown('<h3 style="bold"> The input months should be in range of 11 months for minute by minute chart</h3>', unsafe_allow_html=True)
                                     # fig_minute.add_trace(go.Scatter(
                                     #     x=df.index,
                                     #     y=df[pollutant_map[pollutant]],
