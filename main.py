@@ -2244,19 +2244,23 @@ elif st.session_state.script_choice == 'device_data_comparison':
                             
                             if not df.empty:
                                 df.set_index('datetime', inplace=True)
-                                
+
                                 # Create hourly averages for first chart
                                 df_hourly = df.resample('H').mean().dropna()
+                                merged_df_min_hour = pd.merge(df_hourly, df, on = 'datetime', how='inner')
+
                                 # generate button for download both csv
                                 st.download_button(
-                                    label=f"📄 Download {location} Minute by Minute CSV",
-                                    data=df.to_csv().encode('utf-8'),
+                                    label=f"Download {location} Minute by Minute CSV",
+                                    data=merged_df_min_hour.to_csv().encode('utf-8'),
                                     file_name=f"{location}_minute.csv",
                                     mime="text/csv"
                                 )
                                 
+                                
+
                                 # download the csv 
-                                df_hourly.to_csv(f"{location}_hourly.csv")
+                                # df_hourly.to_csv(f"{location}_hourly.csv")
                                 # Download the csv
                                 # df.to_csv(f"{location}_minute.csv")
                                 
