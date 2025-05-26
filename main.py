@@ -2211,7 +2211,9 @@ elif st.session_state.script_choice == 'device_data_comparison':
                     # Check date range condition once before processing devices
                     is_long_range = (end_date - start_date).days > 335
                     if is_long_range:
-                        st.markdown('<h3 style="bold">Showing hourly data only - the selected range exceeds 11 months</h3>', unsafe_allow_html=True)
+                        st.markdown(
+                            '<h3><b>Generating chart of hourly data only — the selected range exceeds 11 months. Line chart of minute-by-minute data is only available for date ranges within 11 months.</b></h3>',
+                            unsafe_allow_html=True)
                     
                     # Fetch and plot data for each unique device
                     for device_id, color, location in device_colors:
