@@ -2247,7 +2247,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
 
                                 # Create hourly averages for first chart
                                 df_hourly = df.resample('H').mean().dropna()
-                                merged_df_min_hour = pd.merge(df_hourly, df, on = 'datetime', how='inner')
+                                merged_df_min_hour = pd.merge(df_hourly, df, how='inner')
 
                                 # generate button for download both csv
                                 st.download_button(
