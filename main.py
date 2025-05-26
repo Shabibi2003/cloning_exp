@@ -2332,9 +2332,13 @@ elif st.session_state.script_choice == 'device_data_comparison':
                             for season, (months, color) in seasons.items():
                                 seasonal_data = df[df.index.month.isin(months)]
                                 if not seasonal_data.empty:
+                                    # Calculate hourly averages for the season
+                                    hourly_data = seasonal_data.groupby([seasonal_data.index.hour])[pollutant].mean()
+                                    hours = list(range(24))
+                                    
                                     fig.add_trace(go.Scatter(
-                                        x=seasonal_data.index,
-                                        y=seasonal_data[pollutant],
+                                        x=hours,
+                                        y=[hourly_data.get(hour, None) for hour in hours],
                                         name=f"{season}",
                                         line=dict(color=color),
                                         fill='tonexty',
@@ -2342,9 +2346,10 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                     ))
                             
                             fig.update_layout(
-                                title=f"Seasonal {pollutant} Trends for {location}",
-                                xaxis_title="Date",
+                                title=f"Average Daily {pollutant} Patterns by Season for {location}",
+                                xaxis_title="Hour of Day",
                                 yaxis_title=f"{pollutant} Value",
+                                xaxis=dict(tickmode='array', ticktext=list(range(24)), tickvals=list(range(24))),
                                 showlegend=True,
                                 legend=dict(
                                     orientation="h",
@@ -2359,20 +2364,20 @@ elif st.session_state.script_choice == 'device_data_comparison':
                             return fig
 
                         # Create seasonal charts for selected locations
-                        st.markdown("### Hourly Data by Seasons")
-                        st.write("Analyzing seasonal patterns with different colors for each season.")
+                        st.markdown("### Seasonal Patterns Analysis")
+                        st.write("24-hour average patterns for each season, showing how values vary throughout the day.")
                         
                         for device_id, color, location in device_colors:
                             if location in processed_locations:
+                                # Query all available data for the device
                                 query = """
                                 SELECT datetime, {}
                                 FROM reading_db
-                                WHERE deviceID = %s 
-                                AND DATE(datetime) BETWEEN %s AND %s
+                                WHERE deviceID = %s
                                 ORDER BY datetime;
                                 """.format(pollutant_map[pollutant])
                                 
-                                cursor.execute(query, (device_id, start_date, end_date))
+                                cursor.execute(query, (device_id,))
                                 rows = cursor.fetchall()
                                 
                                 if rows:
@@ -2403,9 +2408,13 @@ elif st.session_state.script_choice == 'device_data_comparison':
                             for season, (months, color) in seasons.items():
                                 seasonal_data = df[df.index.month.isin(months)]
                                 if not seasonal_data.empty:
+                                    # Calculate hourly averages for the season
+                                    hourly_data = seasonal_data.groupby([seasonal_data.index.hour])[pollutant].mean()
+                                    hours = list(range(24))
+                                    
                                     fig.add_trace(go.Scatter(
-                                        x=seasonal_data.index,
-                                        y=seasonal_data[pollutant],
+                                        x=hours,
+                                        y=[hourly_data.get(hour, None) for hour in hours],
                                         name=f"{season}",
                                         line=dict(color=color),
                                         fill='tonexty',
@@ -2413,9 +2422,10 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                     ))
                             
                             fig.update_layout(
-                                title=f"Seasonal {pollutant} Trends for {location}",
-                                xaxis_title="Date",
+                                title=f"Average Daily {pollutant} Patterns by Season for {location}",
+                                xaxis_title="Hour of Day",
                                 yaxis_title=f"{pollutant} Value",
+                                xaxis=dict(tickmode='array', ticktext=list(range(24)), tickvals=list(range(24))),
                                 showlegend=True,
                                 legend=dict(
                                     orientation="h",
@@ -2430,20 +2440,20 @@ elif st.session_state.script_choice == 'device_data_comparison':
                             return fig
 
                         # Create seasonal charts for selected locations
-                        st.markdown("### Hourly Data by Seasons")
-                        st.write("Analyzing seasonal patterns with different colors for each season.")
+                        st.markdown("### Seasonal Patterns Analysis")
+                        st.write("24-hour average patterns for each season, showing how values vary throughout the day.")
                         
                         for device_id, color, location in device_colors:
                             if location in processed_locations:
+                                # Query all available data for the device
                                 query = """
                                 SELECT datetime, {}
                                 FROM reading_db
-                                WHERE deviceID = %s 
-                                AND DATE(datetime) BETWEEN %s AND %s
+                                WHERE deviceID = %s
                                 ORDER BY datetime;
                                 """.format(pollutant_map[pollutant])
                                 
-                                cursor.execute(query, (device_id, start_date, end_date))
+                                cursor.execute(query, (device_id,))
                                 rows = cursor.fetchall()
                                 
                                 if rows:
