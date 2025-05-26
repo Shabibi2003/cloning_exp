@@ -2315,11 +2315,11 @@ elif st.session_state.script_choice == 'device_data_comparison':
                         st.markdown('<hr style="border:1px solid black">', unsafe_allow_html=True)
                         st.plotly_chart(fig_minute, use_container_width=True)
 
-                        # Add seasonal chart section
-                        st.markdown("<h3 style='font-size:24px; text-align:left; font-weight:bold;'>Seasonal Analysis</h3>", unsafe_allow_html=True)
+                        # Add seasonal chart section for PM2.5
+                        st.markdown("<h3 style='font-size:24px; text-align:left; font-weight:bold;'>PM2.5 Seasonal Analysis</h3>", unsafe_allow_html=True)
                         st.markdown("<br>", unsafe_allow_html=True)
-
-                        def plot_seasonal_comparison(df, device_id, location, pollutant):
+                        
+                        def plot_seasonal_pm25(df, device_id, location):
                             seasons = {
                                 "Spring": ([2, 3, 4], '#90EE90'),  # Light green
                                 "Summer": ([5, 6, 7], '#FFD700'),  # Gold
@@ -2333,7 +2333,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                 seasonal_data = df[df.index.month.isin(months)]
                                 if not seasonal_data.empty:
                                     # Calculate hourly averages for the season
-                                    hourly_data = seasonal_data.groupby([seasonal_data.index.hour])[pollutant].mean()
+                                    hourly_data = seasonal_data.groupby([seasonal_data.index.hour])['avg_pm25'].mean()
                                     hours = list(range(24))
                                     
                                     fig.add_trace(go.Scatter(
@@ -2346,9 +2346,9 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                     ))
                             
                             fig.update_layout(
-                                title=f"Average Daily {pollutant} Patterns by Season for {location}",
+                                title=f"Average Daily PM2.5 Patterns by Season for {location}",
                                 xaxis_title="Hour of Day",
-                                yaxis_title=f"{pollutant} Value",
+                                yaxis_title="PM2.5 (µg/m³)",
                                 xaxis=dict(tickmode='array', ticktext=list(range(24)), tickvals=list(range(24))),
                                 showlegend=True,
                                 legend=dict(
@@ -2361,41 +2361,45 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                 hovermode='x unified'
                             )
                             
+                            # Add threshold line for PM2.5 (25 µg/m³)
+                            fig.add_hline(y=25, line_dash="dash", line_color="red", annotation_text="Threshold (25 µg/m³)")
+                            
                             return fig
-
-                        # Create seasonal charts for selected locations
-                        st.markdown("### Seasonal Patterns Analysis")
-                        st.write("24-hour average patterns for each season, showing how values vary throughout the day.")
                         
-                        for device_id, color, location in device_colors:
-                            if location in processed_locations:
-                                # Query all available data for the device
-                                query = """
-                                SELECT datetime, {}
-                                FROM reading_db
-                                WHERE deviceID = %s
-                                ORDER BY datetime;
-                                """.format(pollutant_map[pollutant])
-                                
-                                cursor.execute(query, (device_id,))
-                                rows = cursor.fetchall()
-                                
-                                if rows:
-                                    df = pd.DataFrame(rows, columns=["datetime", pollutant_map[pollutant]])
-                                    df['datetime'] = pd.to_datetime(df['datetime'])
-                                    df = df[df[pollutant_map[pollutant]].notna()]
-                                    df = df[df[pollutant_map[pollutant]] != 0]
+                        # Create seasonal charts for selected locations
+                        if data_processed > 0:
+                            st.markdown("### PM2.5 Seasonal Patterns Analysis")
+                            st.write("24-hour average patterns for each season, showing how PM2.5 levels vary throughout the day.")
+                            
+                            for device_id, color, location in device_colors:
+                                if location in processed_locations:
+                                    # Query all available data for the device
+                                    query = """
+                                    SELECT datetime, avg_pm25
+                                    FROM reading_db
+                                    WHERE deviceID = %s
+                                    ORDER BY datetime;
+                                    """
                                     
-                                    if not df.empty:
-                                        df.set_index('datetime', inplace=True)
-                                        seasonal_fig = plot_seasonal_comparison(df, device_id, location, pollutant_map[pollutant])
-                                        st.plotly_chart(seasonal_fig, use_container_width=True)
+                                    cursor.execute(query, (device_id,))
+                                    rows = cursor.fetchall()
+                                    
+                                    if rows:
+                                        df = pd.DataFrame(rows, columns=["datetime", "avg_pm25"])
+                                        df['datetime'] = pd.to_datetime(df['datetime'])
+                                        df = df[df['avg_pm25'].notna()]
+                                        df = df[df['avg_pm25'] != 0]
+                                        
+                                        if not df.empty:
+                                            df.set_index('datetime', inplace=True)
+                                            seasonal_fig = plot_seasonal_pm25(df, device_id, location)
+                                            st.plotly_chart(seasonal_fig, use_container_width=True)
 
-                        # Add seasonal chart section
-                        st.markdown("<h3 style='font-size:24px; text-align:left; font-weight:bold;'>Seasonal Analysis</h3>", unsafe_allow_html=True)
+                        # Add seasonal chart section for PM2.5
+                        st.markdown("<h3 style='font-size:24px; text-align:left; font-weight:bold;'>PM2.5 Seasonal Analysis</h3>", unsafe_allow_html=True)
                         st.markdown("<br>", unsafe_allow_html=True)
-
-                        def plot_seasonal_comparison(df, device_id, location, pollutant):
+                        
+                        def plot_seasonal_pm25(df, device_id, location):
                             seasons = {
                                 "Spring": ([2, 3, 4], '#90EE90'),  # Light green
                                 "Summer": ([5, 6, 7], '#FFD700'),  # Gold
@@ -2409,7 +2413,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                 seasonal_data = df[df.index.month.isin(months)]
                                 if not seasonal_data.empty:
                                     # Calculate hourly averages for the season
-                                    hourly_data = seasonal_data.groupby([seasonal_data.index.hour])[pollutant].mean()
+                                    hourly_data = seasonal_data.groupby([seasonal_data.index.hour])['avg_pm25'].mean()
                                     hours = list(range(24))
                                     
                                     fig.add_trace(go.Scatter(
@@ -2422,9 +2426,9 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                     ))
                             
                             fig.update_layout(
-                                title=f"Average Daily {pollutant} Patterns by Season for {location}",
+                                title=f"Average Daily PM2.5 Patterns by Season for {location}",
                                 xaxis_title="Hour of Day",
-                                yaxis_title=f"{pollutant} Value",
+                                yaxis_title="PM2.5 (µg/m³)",
                                 xaxis=dict(tickmode='array', ticktext=list(range(24)), tickvals=list(range(24))),
                                 showlegend=True,
                                 legend=dict(
@@ -2437,35 +2441,39 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                 hovermode='x unified'
                             )
                             
+                            # Add threshold line for PM2.5 (25 µg/m³)
+                            fig.add_hline(y=25, line_dash="dash", line_color="red", annotation_text="Threshold (25 µg/m³)")
+                            
                             return fig
-
-                        # Create seasonal charts for selected locations
-                        st.markdown("### Seasonal Patterns Analysis")
-                        st.write("24-hour average patterns for each season, showing how values vary throughout the day.")
                         
-                        for device_id, color, location in device_colors:
-                            if location in processed_locations:
-                                # Query all available data for the device
-                                query = """
-                                SELECT datetime, {}
-                                FROM reading_db
-                                WHERE deviceID = %s
-                                ORDER BY datetime;
-                                """.format(pollutant_map[pollutant])
-                                
-                                cursor.execute(query, (device_id,))
-                                rows = cursor.fetchall()
-                                
-                                if rows:
-                                    df = pd.DataFrame(rows, columns=["datetime", pollutant_map[pollutant]])
-                                    df['datetime'] = pd.to_datetime(df['datetime'])
-                                    df = df[df[pollutant_map[pollutant]].notna()]
-                                    df = df[df[pollutant_map[pollutant]] != 0]
+                        # Create seasonal charts for selected locations
+                        if data_processed > 0:
+                            st.markdown("### PM2.5 Seasonal Patterns Analysis")
+                            st.write("24-hour average patterns for each season, showing how PM2.5 levels vary throughout the day.")
+                            
+                            for device_id, color, location in device_colors:
+                                if location in processed_locations:
+                                    # Query all available data for the device
+                                    query = """
+                                    SELECT datetime, avg_pm25
+                                    FROM reading_db
+                                    WHERE deviceID = %s
+                                    ORDER BY datetime;
+                                    """
                                     
-                                    if not df.empty:
-                                        df.set_index('datetime', inplace=True)
-                                        seasonal_fig = plot_seasonal_comparison(df, device_id, location, pollutant_map[pollutant])
-                                        st.plotly_chart(seasonal_fig, use_container_width=True)
+                                    cursor.execute(query, (device_id,))
+                                    rows = cursor.fetchall()
+                                    
+                                    if rows:
+                                        df = pd.DataFrame(rows, columns=["datetime", "avg_pm25"])
+                                        df['datetime'] = pd.to_datetime(df['datetime'])
+                                        df = df[df['avg_pm25'].notna()]
+                                        df = df[df['avg_pm25'] != 0]
+                                        
+                                        if not df.empty:
+                                            df.set_index('datetime', inplace=True)
+                                            seasonal_fig = plot_seasonal_pm25(df, device_id, location)
+                                            st.plotly_chart(seasonal_fig, use_container_width=True)
                     else:
                         st.error("No valid data available for plotting. Please check your selection.")
                     
