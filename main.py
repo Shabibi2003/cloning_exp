@@ -2228,7 +2228,8 @@ elif st.session_state.script_choice == 'device_data_comparison':
                         rows = cursor.fetchall()
                         
                         # Debug print
-                        st.write(f"Found {len(rows)} data points for {location}")
+                        st.write(f"Short Analysis for Minute by Minute Data")
+                        st.write(f"Found {len(rows)} data points for {location}.")
                         
                         if rows:
                             # Process data
@@ -2267,13 +2268,20 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                         line=dict(color=color)
                                     ))
                                     
-
-                                    fig_minute.add_trace(go.Scatter(
-                                        x=df.index,
-                                        y=df[pollutant_map[pollutant]],
-                                        name=f"{location} (Minute)",
-                                        line=dict(color=color)
-                                    ))
+                                    # generate minute by minute line chart if the input months are in range of 11 months 
+                                    if (end_date - start_date).days <= 330:
+                                        fig_minute.add_trace(go.Scatter(
+                                            x=df.index,
+                                            y=df[pollutant_map[pollutant]],
+                                            name=f"{location} (Minute)",
+                                            line=dict(color=color)
+                                        ))
+                                    # fig_minute.add_trace(go.Scatter(
+                                    #     x=df.index,
+                                    #     y=df[pollutant_map[pollutant]],
+                                    #     name=f"{location} (Minute)",
+                                    #     line=dict(color=color)
+                                    # ))
                                     
                                     data_processed += 1
                                 else:
