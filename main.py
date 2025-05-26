@@ -2333,7 +2333,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                 seasonal_data = df[df.index.month.isin(months)]
                                 if not seasonal_data.empty:
                                     # Calculate hourly averages for the season
-                                    hourly_data = seasonal_data.groupby([seasonal_data.index.hour])['avg_pm25'].mean()
+                                    hourly_data = seasonal_data.groupby([seasonal_data.index.hour])['pm25'].mean()
                                     hours = list(range(24))
                                     
                                     fig.add_trace(go.Scatter(
