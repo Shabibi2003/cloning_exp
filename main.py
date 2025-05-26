@@ -1,4 +1,5 @@
 import pandas as pd
+from referencing.jsonschema import UnknownDialect
 import streamlit as st
 import plotly.graph_objects as go
 import mysql.connector
@@ -71,7 +72,7 @@ st.markdown("""
 if 'script_choice' not in st.session_state:
     st.session_state.script_choice = "people"  # Set default to "about"
 
-col1, col2, col3, col4, col5 = st.columns(5)
+col1, col2, col3, col4, col5, col6 = st.columns(6)
 with col1:
     if st.button('People EDS'):
         st.session_state.script_choice = "people"
@@ -87,7 +88,9 @@ with col4:
 with col5:
     if st.button('Monthly Trends'):
         st.session_state.script_choice = "monthly_trends"
-
+with col6:
+    if st.button('Device Comparison'):
+        st.session_state.script_choice = 'device_data_comparison'
 # Set the default selected date to one day before the current date
 default_date = datetime.now() - timedelta(days=1)
 #Based on the user selection, display appropriate input fields and run the script
@@ -1422,44 +1425,44 @@ if st.session_state.script_choice == "monthly_trends":
 
     # Device Data Dictionary (deviceID, address, typology)
     device_data = {
-        "1201240075": ("Hines Office, 12th Floor, One Horizon Centre, Sec-43, Gurugram", "Office"),
-        "1201240078": ("Hines Office, 12th Floor, One Horizon Centre, Sec-43, Gurugram", "Office"),
-        "1202240026": ("D-1/25 Vasant Vihar, New Delhi-110057(EDS Delhi)", "Office"),
-        "1202240025": ("D-1/25 Vasant Vihar, New Delhi-110057(EDS Delhi)", "Office"),
-        "1203240081": ("26A Poorvi Marg, Vasant Vihar, New Delhi-110057 (EDS, E-Block, Delhi)", "Office"),
-        "1202240011": ("D-188, Abul Fazal Enclave-I, Jamia Nagar, New Delhi-110025", "Apartment"),
-        "1202240027": ("D-188, Abul Fazal Enclave-I, Jamia Nagar, New Delhi-110025", "Apartment"),
-        "1203240076": ("D 184 ABUL FAZAL ENCLAVE, JAMIA NAGAR, OKHLA, NEW DELHI 25", "Midrise Apartment (G+5)"),
-        "1203240078": ("D 184 ABUL FAZAL ENCLAVE, JAMIA NAGAR, OKHLA, NEW DELHI 25", "Midrise Apartment (G+5)"),
-        "1203240075": ("A 48/B, Third Floor, Abul Fazal Enclave Part II, New Delhi", "Residential"),
-        "1201240077": ("448, Sector-9, Pocket-1 DDA Flats Dwarka, New Delhi-110075", "Residential"),
-        "1201240072": ("448, Sector-9, Pocket-1 DDA Flats Dwarka, New Delhi-110075", "Residential"),
-        "1203240079": ("C-403, Prince Apartments, Plot 54, I.P. Extension, Patparganj, Delhi - 110092", "Residential, Multi-family"),
-        "1201240079": ("B-3/527, Ekta Gardens Apts, Patparganj, Delhi - 110092", "Residential"),
-        "1201240085": ("B-3/527, Ekta Gardens Apts, Patparganj, Delhi - 110092", "Residential"),
-        "1203240083": ("Flat No. 25, Tower E2, Sector E1, Vasant Kunj, New Delhi", "Residential"),
-        "1203240073": ("Flat no. 495, Block 14, Kaveri Apartments, D6, Vasant Kunj, Delhi - 110070", "Residential"),
-        "1203240074": ("569 sector A pocket C Vasant Kunj, Delhi - 110070", "Residential"),
-        "1201240076": ("H No.-296 Near Durga Ashram, Chhatarpur, Delhi-110074", "Residential"),
-        "1212230160": ("H No.-296 Near Durga Ashram, Chhatarpur, Delhi-110074", "Residential"),
-        "1202240009": ("D-13A 2nd Floor Left side, Paryavaran Complex, Delhi 1100030", "Office"),
-        "1202240008": ("D-13A 2nd Floor Left side, Paryavaran Complex, Delhi 1100030", "Office"),
-        "1201240073": ("569 sector A pocket C Vasant Kunj, Delhi - 110070", "Residential"),
-        "1203240080": ("F-5, 318-N, Chirag Delhi, Delhi-110017", "Residential"),
-        "1201240074": ("F-5, 318-N, Chirag Delhi, Delhi-110017", "Residential"),
-        "1203240077": ("B-2/51-A, Keshav Puram", "Apartment"),
-        "1203240082": ("B-2/51-A, Keshav Puram", "Apartment"),
-        "1202240029": ("St. Mary's School, Dwarka Sec-19", "Office"),
-        "1202240028": ("St. Mary's School, Dwarka Sec-19", "Office"),
-        "1202240010": ("St. Mary's School, Dwarka Sec-19", "Office"),
-        "1202240012": ("St. Mary's School, Dwarka Sec-19", "School"),
+        "1201240075": ("Hines Office, 12th Floor, One Horizon Centre, Sec-43, Gurugram", "Office","Hines Office 1"),
+        "1201240078": ("Hines Office, 12th Floor, One Horizon Centre, Sec-43, Gurugram", "Office","Hines Office 2"),
+        "1202240026": ("D-1/25 Vasant Vihar, New Delhi-110057(EDS Delhi)", "Office","EDS D Block "),
+        "1202240025": ("D-1/25 Vasant Vihar, New Delhi-110057(EDS Delhi)", "Office","EDS D Block "),
+        "1203240081": ("26A Poorvi Marg, Vasant Vihar, New Delhi-110057 (EDS, E-Block, Delhi)", "Office","EDS E Block"),
+        "1202240011": ("D-188, Abul Fazal Enclave-I, Jamia Nagar, New Delhi-110025", "Apartment","Mariyam Living Room"),
+        "1202240027": ("D-188, Abul Fazal Enclave-I, Jamia Nagar, New Delhi-110025", "Apartment","Mariyam Bedroom"),
+        "1203240076": ("D 184 ABUL FAZAL ENCLAVE, JAMIA NAGAR, OKHLA, NEW DELHI 25", "Midrise Apartment (G+5)","Hisham Living Room"),
+        "1203240078": ("D 184 ABUL FAZAL ENCLAVE, JAMIA NAGAR, OKHLA, NEW DELHI 25", "Midrise Apartment (G+5)","Hisham Bedroom"),
+        "1203240075": ("A 48/B, Third Floor, Abul Fazal Enclave Part II, New Delhi", "Residential","Shahzeb Kitchen"),
+        "1201240072": ("448, Sector-9, Pocket-1 DDA Flats Dwarka, New Delhi-110075", "Residential","Lakshmi Living Room"),
+        "1201240077": ("448, Sector-9, Pocket-1 DDA Flats Dwarka, New Delhi-110075", "Residential","Lakshmi Kitchen"),
+        "1203240079": ("C-403, Prince Apartments, Plot 54, I.P. Extension, Patparganj, Delhi - 110092", "Residential, Multi-family","Piyush Living Room"),
+        "1201240079": ("B-3/527, Ekta Gardens Apts, Patparganj, Delhi - 110092", "Residential","Piyush Bedroom"),
+        "1201240085": ("B-3/527, Ekta Gardens Apts, Patparganj, Delhi - 110092", "Residential","Piyush Living Room"),
+        "1203240083": ("Flat No. 25, Tower E2, Sector E1, Vasant Kunj, New Delhi", "Residential","Sheetal Living Room"),
+        "1203240073": ("Flat no. 495, Block 14, Kaveri Apartments, D6, Vasant Kunj, Delhi - 110070", "Residential",'Nidhi Bedroom'),
+        "1203240074": ("569 sector A pocket C Vasant Kunj, Delhi - 110070", "Residential","Ashish Living Room"),
+        "1201240076": ("H No.-296 Near Durga Ashram, Chhatarpur, Delhi-110074", "Residential","Surender Living Room"),
+        "1212230160": ("H No.-296 Near Durga Ashram, Chhatarpur, Delhi-110074", "Residential","Surender Bedroom"),
+        "1202240009": ("D-13A 2nd Floor Left side, Paryavaran Complex, Delhi 1100030", "Office","Robin Bedroom"),
+        "1202240008": ("D-13A 2nd Floor Left side, Paryavaran Complex, Delhi 1100030", "Office","Robin Living Room"),
+        "1201240073": ("569 sector A pocket C Vasant Kunj, Delhi - 110070", "Residential","Tanmay Tathagat"),
+        "1203240080": ("F-5, 318-N, Chirag Delhi, Delhi-110017", "Residential","Abhishek Bedroom"),
+        "1201240074": ("F-5, 318-N, Chirag Delhi, Delhi-110017", "Residential","Abhishek Living Room"),
+        "1203240077": ("B-2/51-A, Keshav Puram", "Apartment","Gurneet Mannat Room"),
+        "1203240082": ("B-2/51-A, Keshav Puram", "Apartment","Gurneet Prabhansh Room"),
+        "1202240029": ("St. Mary's School, Dwarka Sec-19", "Office","St. Mary's School"),
+        "1202240028": ("St. Mary's School, Dwarka Sec-19", "Office","St. Mary's School"),
+        "1202240010": ("St. Mary's School, Dwarka Sec-19", "Office","St. Mary's School"),
+        "1202240012": ("St. Mary's School, Dwarka Sec-19", "School","St. Mary's School"),
     }
 
     residential_ids = [
         "1203240075", "1201240077", "1201240072", "1203240079", "1201240079",
         "1201240085", "1203240083", "1203240073", "1203240074", "1201240076",
         "1212230160", "1201240073", "1203240080", "1201240074","1202240011",
-        "1202240027", "1203240076", "1203240078", "1203240075", "1203240079",
+        "1202240027", "1203240076", "1203240078", "1203240079"
     ]
 
     # Mapping of indoor device IDs to outdoor device IDs
@@ -1775,6 +1778,9 @@ if st.session_state.script_choice == "monthly_trends":
         fig, ax = plt.subplots(figsize=(10, 6))
         indoor_df_hourly['heat_index'].plot(ax=ax, color='blue', linewidth=2, label="Indoor Heat Index")
         outdoor_df_hourly['heat_index'].plot(ax=ax, color='orange', linewidth=2, label="Outdoor Heat Index")
+        ax.axhline(y=26.6, color='brown', linestyle='--', linewidth=1.5, label="Caution (26.6°C)")
+        ax.axhline(y=32, color='blue', linestyle='--', linewidth=1.5, label="Extreme Caution (32°C)")
+        ax.axhline(y=40, color='red', linestyle='--', linewidth=1.5, label="Danger (40°C)")
         ax.set_title("Hourly Average Heat Index (°C)", fontsize=16)
         ax.set_xlabel("Time", fontsize=12)
         ax.set_ylabel("Heat Index (°C)", fontsize=12)
@@ -1899,6 +1905,7 @@ if st.session_state.script_choice == "monthly_trends":
         # Display address and typology
     st.write(f"Address: {device_info[0]}")
     st.write(f"Typology: {device_info[1]}")
+    st.write(f"Device Location: {device_info[2]}")
 
     st.markdown('<div class="black-line"></div>', unsafe_allow_html=True)
 
@@ -2065,7 +2072,263 @@ if st.session_state.script_choice == "monthly_trends":
                         conn.close()
 
 
-st.markdown('<hr style="border:1px solid black">', unsafe_allow_html=True)
+    st.markdown('<hr style="border:1px solid black">', unsafe_allow_html=True)
+
+elif st.session_state.script_choice == 'device_data_comparison':
+    st.header('Device Data Comparison')
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # Define device data dictionary with device IDs and their information
+    device_data = {
+        '1203240077': ('Gurneet  Bedroom', 'Residential'),
+        '1203240076': ('Hisham Living Room', 'Residential'),
+        '1201240079': ('Piyush Bedroom', 'Residential'),
+        '1201240085': ('Piyush Living Room', 'Residential'),
+        '1203240083': ('Sheetal Living Room', 'Residential'),
+        '1201240072': ('Lakshmi Living Room', 'Residential'),
+        '1201240077': ('Lakshmi Kitchen', 'Residential'),
+        '1202240027': ('Mariyam Bedroom 1', 'Residential'),
+        '1202240011': ('Mariyam Living Room', 'Residential'),
+        '1201240074': ('Abhishek Living Room', 'Residential'),
+        '1203240080': ('Abhishek Bedroom', 'Residential'),
+        '1212230160': ('Surender Bedroom', 'Residential'),
+        '1201240076': ('Surender Living Room', 'Residential'),
+        '1202240009': ('Robin Bedroom', 'Residential'),
+        '1202240008': ('Robin Living Room', 'Residential'),
+        '1201240075': ('Hines Office 1', 'Office'),
+        '1201240078': ('Hines Office 2', 'Office'),
+        '1202240025': ('EDS D Block 1', 'Office'),
+        '1202240026': ('EDS D Block 2', 'Office'),
+        '1203240073': ('Nidhi Bedroom', 'Residential'),
+        '1203240081': ('EDS E Block', 'Office'),
+        '1203240078': ('Hisham Bedroom', 'Residential'),
+        '1203240075': ('Shahzeb Kitchen', 'Residential'),
+        '1203240079': ('Piyush Living Room Prince Apart.', 'Residential'),
+        '1203240074': ('Ashish Living Room', 'Residential'),
+        '1201240073': ('Tanmay Tathagat', 'Residential'),
+        '1203240082': ('Gurneet Prabhansh Room', 'Residential'),
+        '1202240029': ("St. Mary's School", 'Office'),
+        '1202240028': ('St. Marys School', 'Office'),
+        '1202240010': ('St. Marys School', 'Office'),
+        '1202240012': ('St. Marys School', 'Office')
+
+    }
+    
+    # Create reverse mapping from location to device ID
+    location_to_device = {info[0]: device_id for device_id, info in device_data.items()}
+    
+    # Get list of locations
+    locations = ['None'] + sorted(location_to_device.keys())
+    
+    # Create columns for device selection
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        location_1 = st.selectbox("Select First Location:", options=locations, index=0, key='location_1')
+        if location_1 != 'None':
+            device_id_1 = location_to_device[location_1]
+            st.write(f"Device ID: {device_id_1}")
+            st.write(f"Type: {device_data[device_id_1][1]}")
+    
+    with col2:
+        location_2 = st.selectbox("Select Second Location:", options=locations, index=0, key='location_2')
+        if location_2 != 'None':
+            device_id_2 = location_to_device[location_2]
+            st.write(f"Device ID: {device_id_2}")
+            st.write(f"Type: {device_data[device_id_2][1]}")
+    
+    with col3:
+        location_3 = st.selectbox("Select Third Location:", options=locations, index=0, key='location_3')
+        if location_3 != 'None':
+            device_id_3 = location_to_device[location_3]
+            st.write(f"Device ID: {device_id_3}")
+            st.write(f"Type: {device_data[device_id_3][1]}")
+    
+    # Add date range selection
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        start_date = st.date_input("Start Date", value=datetime(2024, 4, 1))
+    with col2:
+        end_date = st.date_input("End Date", value=datetime(2024, 4, 30))
+
+    with col3:
+        pollutant = st.selectbox("Select Pollutant:", ["PM2.5", "PM10", "AQI", "CO2", "VOC", "Temperature", "Humidity"], key='pollutant')
+    
+    st.markdown('<hr style="border:1px solid black">', unsafe_allow_html=True)
+
+    # Map display names to database column names
+    pollutant_map = {
+        "PM2.5": "pm25",
+        "PM10": "pm10",
+        "AQI": "aqi",
+        "CO2": "co2",
+        "VOC": "voc",
+        "Temperature": "temp",
+        "Humidity": "humidity"
+    }
+    host = "139.59.34.149"
+    user = "neemdb"
+    password = "(#&pxJ&p7JvhA7<B"
+    database = "cabh_iaq_db"
+    # Button to generate comparison
+    if st.button("Generate Charts"):
+        # Get selected locations (excluding 'None')
+        selected_locations = [loc for loc in [location_1, location_2, location_3] if loc != 'None']
+        
+        if not selected_locations:
+            st.error("Please select at least one location")
+        else:
+            with st.spinner("Generating Charts...please wait"):
+                try:
+                    # Connect to the MySQL database
+                    conn = mysql.connector.connect(
+                        host=host,
+                        user=user,
+                        password=password,
+                        database=database
+                    )
+                    cursor = conn.cursor()
+                    
+                    # Create figures for both hourly and minute-by-minute comparisons
+                    fig_hourly = go.Figure()
+                    fig_minute = go.Figure()
+                    
+                    # Debug counter for data processing
+                    data_processed = 0
+                    
+                    # Create a list of device IDs and their colors for selected locations
+                    device_colors = []
+                    if location_1 != 'None':
+                        device_colors.append((location_to_device[location_1], 'pink', location_1))
+                    if location_2 != 'None':
+                        device_colors.append((location_to_device[location_2], 'red', location_2))
+                    if location_3 != 'None':
+                        device_colors.append((location_to_device[location_3], 'green', location_3))
+                    
+                    # Only process unique locations
+                    processed_locations = set()
+                    
+                    # Check date range condition once before processing devices
+                    is_long_range = (end_date - start_date).days > 335
+                    if is_long_range:
+                        st.markdown(
+                            '<h3><b>Generating chart of hourly data only — the selected range exceeds 11 months. Line chart of minute-by-minute data is only available for date ranges within 11 months.</b></h3>',
+                            unsafe_allow_html=True)
+                    
+                    # Fetch and plot data for each unique device
+                    for device_id, color, location in device_colors:
+                        if location in processed_locations:
+                            continue
+                            
+                        processed_locations.add(location)
+                        
+                        # Query to fetch data for the selected date range
+                        query = """
+                        SELECT datetime, {}
+                        FROM reading_db
+                        WHERE deviceID = %s 
+                        AND DATE(datetime) BETWEEN %s AND %s
+                        ORDER BY datetime;
+                        """.format(pollutant_map[pollutant])
+                        
+                        cursor.execute(query, (device_id, start_date, end_date))
+                        rows = cursor.fetchall()
+                        
+                        # Debug print
+                        st.write(f"Short Analysis for Minute by Minute Data")
+                        st.write(f"Found {len(rows)} data points for {location}.")
+                        
+                        if rows:
+                            # Process data
+                            df = pd.DataFrame(rows, columns=["datetime", pollutant_map[pollutant]])
+                            df['datetime'] = pd.to_datetime(df['datetime'])
+                            
+                            # Debug print
+                            st.write(f"Data range for {location}: {df['datetime'].min()} to {df['datetime'].max()}")
+                            
+                            # Remove zeros and null values
+                            df = df[df[pollutant_map[pollutant]].notna()]
+                            df = df[df[pollutant_map[pollutant]] != 0]
+                            
+                            if not df.empty:
+                                df.set_index('datetime', inplace=True)
+
+                                # Create hourly averages for first chart
+                                df_hourly = df.resample('H').mean().dropna()
+
+
+                                # generate button for download both csv
+                                # st.download_button(
+                                #     label=f"Download {location} Minute by Minute CSV",
+                                #     data=df.to_csv().encode('utf-8'),
+                                #     file_name=f"{location}_minute.csv",
+                                #     mime="text/csv"
+                                # )
+                                
+                                
+                                if not df_hourly.empty:
+                                    # Add traces to hourly figure
+                                    fig_hourly.add_trace(go.Scatter(
+                                        x=df_hourly.index,
+                                        y=df_hourly[pollutant_map[pollutant]],
+                                        name=f"{location} (Hourly)",
+                                        line=dict(color=color)
+                                    ))
+                                    
+                                    # Only add minute data if within range
+                                    if not is_long_range:
+                                        fig_minute.add_trace(go.Scatter(
+                                            x=df.index,
+                                            y=df[pollutant_map[pollutant]],
+                                            name=f"{location} (Minute)",
+                                            line=dict(color=color)
+                                        ))
+                                    
+                                    data_processed += 1
+                                else:
+                                    st.warning(f"No valid hourly data for {location} after resampling")
+                            else:
+                                st.write("Details of Minute by Minute Data")
+                                st.warning(f"No valid data points for {location} after filtering zeros")
+                        else:
+                            st.warning(f"No data found for {location} in the selected date range")
+                    
+                    if data_processed > 0:
+                        # Update layouts
+                        fig_hourly.update_layout(
+                            title=f"{pollutant} Comparison (Hourly Averages)",
+                            xaxis_title="Date",
+                            yaxis_title=pollutant,
+                            height=500
+                        )
+                        
+                        # Update layout for minute-by-minute plot
+                        fig_minute.update_layout(
+                            title=f"{pollutant} Comparison (Minute-by-Minute)",
+                            xaxis_title="Date",
+                            yaxis_title=pollutant,
+                            height=500
+                        )
+                        
+                        # Display both plots
+                        st.plotly_chart(fig_hourly, use_container_width=True)
+                        st.markdown('<hr style="border:1px solid black">', unsafe_allow_html=True)
+                        st.plotly_chart(fig_minute, use_container_width=True)
+                    else:
+                        st.error("No valid data available for plotting. Please check your selection.")
+                    
+                except mysql.connector.Error as e:
+                    st.error(f"Database error: {e}")
+                except Exception as e:
+                    st.error(f"An unexpected error occurred: {e}")
+                finally:
+                    # Ensure the database connection is closed
+                    if 'conn' in locals() and conn.is_connected():
+                        cursor.close()
+                        conn.close()
+    
+    st.markdown('<hr style="border:1px solid black">', unsafe_allow_html=True)
+
 st.markdown(
     """
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
