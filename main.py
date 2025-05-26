@@ -2314,6 +2314,77 @@ elif st.session_state.script_choice == 'device_data_comparison':
                         st.plotly_chart(fig_hourly, use_container_width=True)
                         st.markdown('<hr style="border:1px solid black">', unsafe_allow_html=True)
                         st.plotly_chart(fig_minute, use_container_width=True)
+
+                        # Add seasonal chart section
+                        st.markdown("<h3 style='font-size:24px; text-align:left; font-weight:bold;'>Seasonal Analysis</h3>", unsafe_allow_html=True)
+                        st.markdown("<br>", unsafe_allow_html=True)
+
+                        def plot_seasonal_comparison(df, device_id, location, pollutant):
+                            seasons = {
+                                "Spring": ([2, 3, 4], '#90EE90'),  # Light green
+                                "Summer": ([5, 6, 7], '#FFD700'),  # Gold
+                                "Autumn": ([8, 9, 10], '#D2691E'),  # Chocolate
+                                "Winter": ([11, 12, 1], '#87CEEB')   # Sky blue
+                            }
+                            
+                            fig = go.Figure()
+                            
+                            for season, (months, color) in seasons.items():
+                                seasonal_data = df[df.index.month.isin(months)]
+                                if not seasonal_data.empty:
+                                    fig.add_trace(go.Scatter(
+                                        x=seasonal_data.index,
+                                        y=seasonal_data[pollutant],
+                                        name=f"{season}",
+                                        line=dict(color=color),
+                                        fill='tonexty',
+                                        fillcolor=f"rgba({int(color[1:3], 16)}, {int(color[3:5], 16)}, {int(color[5:7], 16)}, 0.1)"
+                                    ))
+                            
+                            fig.update_layout(
+                                title=f"Seasonal {pollutant} Trends for {location}",
+                                xaxis_title="Date",
+                                yaxis_title=f"{pollutant} Value",
+                                showlegend=True,
+                                legend=dict(
+                                    orientation="h",
+                                    yanchor="bottom",
+                                    y=-0.3,
+                                    xanchor="center",
+                                    x=0.5
+                                ),
+                                hovermode='x unified'
+                            )
+                            
+                            return fig
+
+                        # Create seasonal charts for selected locations
+                        st.markdown("### Hourly Data by Seasons")
+                        st.write("Analyzing seasonal patterns with different colors for each season.")
+                        
+                        for device_id, color, location in device_colors:
+                            if location in processed_locations:
+                                query = """
+                                SELECT datetime, {}
+                                FROM reading_db
+                                WHERE deviceID = %s 
+                                AND DATE(datetime) BETWEEN %s AND %s
+                                ORDER BY datetime;
+                                """.format(pollutant_map[pollutant])
+                                
+                                cursor.execute(query, (device_id, start_date, end_date))
+                                rows = cursor.fetchall()
+                                
+                                if rows:
+                                    df = pd.DataFrame(rows, columns=["datetime", pollutant_map[pollutant]])
+                                    df['datetime'] = pd.to_datetime(df['datetime'])
+                                    df = df[df[pollutant_map[pollutant]].notna()]
+                                    df = df[df[pollutant_map[pollutant]] != 0]
+                                    
+                                    if not df.empty:
+                                        df.set_index('datetime', inplace=True)
+                                        seasonal_fig = plot_seasonal_comparison(df, device_id, location, pollutant_map[pollutant])
+                                        st.plotly_chart(seasonal_fig, use_container_width=True)
                     else:
                         st.error("No valid data available for plotting. Please check your selection.")
                     
