@@ -2247,6 +2247,10 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                 
                                 # Create hourly averages for first chart
                                 df_hourly = df.resample('H').mean().dropna()
+                                # download the csv 
+                                # df_hourly.to_csv(f"{location}_hourly.csv")
+                                # Download the csv
+                                # df.to_csv(f"{location}_minute.csv")
                                 
                                 if not df_hourly.empty:
                                     # Add traces to both figures
