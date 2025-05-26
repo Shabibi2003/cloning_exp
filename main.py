@@ -2336,6 +2336,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                     hourly_data = seasonal_data.groupby([seasonal_data.index.hour])['pm25'].mean()
                                     hours = list(range(24))
                                     
+
                                     fig.add_trace(go.Scatter(
                                         x=hours,
                                         y=[hourly_data.get(hour, None) for hour in hours],
@@ -2375,7 +2376,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                 if location in processed_locations:
                                     # Query all available data for the device
                                     query = """
-                                    SELECT datetime, avg_pm25
+                                    SELECT datetime, pm25
                                     FROM reading_db
                                     WHERE deviceID = %s
                                     ORDER BY datetime;
