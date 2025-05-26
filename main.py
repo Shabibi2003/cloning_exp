@@ -2208,6 +2208,13 @@ elif st.session_state.script_choice == 'device_data_comparison':
                     # Only process unique locations
                     processed_locations = set()
                     
+                    # Check date range condition once before processing devices
+                    is_long_range = (end_date - start_date).days > 335
+                    if is_long_range:
+                        st.markdown(
+                            '<h3><b>Generating chart of hourly data only — the selected range exceeds 11 months. Line chart of minute-by-minute data is only available for date ranges within 11 months.</b></h3>',
+                            unsafe_allow_html=True)
+                    
                     # Fetch and plot data for each unique device
                     for device_id, color, location in device_colors:
                         if location in processed_locations:
@@ -2228,8 +2235,8 @@ elif st.session_state.script_choice == 'device_data_comparison':
                         rows = cursor.fetchall()
                         
                         # Debug print
-                        st.write("Short Analysis for minute by minute data:")
-                        st.write(f"Found {len(rows)} data points for {location}")
+                        st.write(f"Short Analysis for Minute by Minute Data")
+                        st.write(f"Found {len(rows)} data points for {location}.")
                         
                         if rows:
                             # Process data
@@ -2245,16 +2252,22 @@ elif st.session_state.script_choice == 'device_data_comparison':
                             
                             if not df.empty:
                                 df.set_index('datetime', inplace=True)
-                                
+
                                 # Create hourly averages for first chart
                                 df_hourly = df.resample('H').mean().dropna()
-                                # download the csv 
-                                # df_hourly.to_csv(f"{location}_hourly.csv")
-                                # Download the csv
-                                # df.to_csv(f"{location}_minute.csv")
+
+
+                                # generate button for download both csv
+                                # st.download_button(
+                                #     label=f"Download {location} Minute by Minute CSV",
+                                #     data=df.to_csv().encode('utf-8'),
+                                #     file_name=f"{location}_minute.csv",
+                                #     mime="text/csv"
+                                # )
+                                
                                 
                                 if not df_hourly.empty:
-                                    # Add traces to both figures
+                                    # Add traces to hourly figure
                                     fig_hourly.add_trace(go.Scatter(
                                         x=df_hourly.index,
                                         y=df_hourly[pollutant_map[pollutant]],
@@ -2262,12 +2275,14 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                         line=dict(color=color)
                                     ))
                                     
-                                    fig_minute.add_trace(go.Scatter(
-                                        x=df.index,
-                                        y=df[pollutant_map[pollutant]],
-                                        name=f"{location} (Minute)",
-                                        line=dict(color=color)
-                                    ))
+                                    # Only add minute data if within range
+                                    if not is_long_range:
+                                        fig_minute.add_trace(go.Scatter(
+                                            x=df.index,
+                                            y=df[pollutant_map[pollutant]],
+                                            name=f"{location} (Minute)",
+                                            line=dict(color=color)
+                                        ))
                                     
                                     data_processed += 1
                                 else:
