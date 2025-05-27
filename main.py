@@ -2387,8 +2387,12 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                 # df = df[df[pollutant_map[pollutant]] != 0]
                                     
                                 if not df.empty:
+                                    df.set_index('datetime', inplace=True)
+
+                                    # Create hourly averages for first chart
+                                    df_hourly = df.resample('H').mean().dropna()
                                     # df.set_index('datetime', inplace=True)
-                                    seasonal_fig = plot_seasonal_comparison(df, device_id, location, pollutant_map[pollutant])
+                                    seasonal_fig = plot_seasonal_comparison(df_hourly, device_id, location, pollutant_map[pollutant])
                                     st.plotly_chart(seasonal_fig, use_container_width=True)
 
                         # # Add seasonal chart section
