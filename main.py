@@ -20,6 +20,8 @@ from PIL import Image
 import io
 from plotly.subplots import make_subplots
 import sqlite3
+from streamlit_autorefresh import st_autorefresh
+
 
 
 st.set_page_config(
@@ -33,10 +35,15 @@ st.set_page_config(
     }
 )
 
-# Add auto-refresh functionality 
-st.cache_data.clear()
-time.sleep(80)  # Small delay to prevent excessive refreshes
-st.rerun()
+# Auto-refresh every 60 seconds
+st_autorefresh(interval=60 * 1000, key="refresh")
+# Hide the Streamlit menu and footer
+hide_streamlit_style = """
+            <style>
+            #MainMenu {visibility: hidden;}
+            </style>
+            """
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 st.markdown("""
     <h1 style='text-align: center; font-size: 34px; background: linear-gradient(90deg, green, green, green, green, green, green, green);
