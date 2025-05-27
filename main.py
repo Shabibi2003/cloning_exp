@@ -2395,49 +2395,49 @@ elif st.session_state.script_choice == 'device_data_comparison':
                         st.markdown("<h3 style='font-size:24px; text-align:left; font-weight:bold;'>Seasonal Analysis</h3>", unsafe_allow_html=True)
                         st.markdown("<br>", unsafe_allow_html=True)
 
-                        def plot_seasonal_comparison(df, device_id, location, pollutant):
-                            seasons = {
-                                "Spring": ([2, 3, 4], '#90EE90'),  # Light green
-                                "Summer": ([5, 6, 7], '#FFD700'),  # Gold
-                                "Autumn": ([8, 9, 10], '#D2691E'),  # Chocolate
-                                "Winter": ([11, 12, 1], '#87CEEB')   # Sky blue
-                            }
+                        # def plot_seasonal_comparison(df, device_id, location, pollutant):
+                        #     seasons = {
+                        #         "Spring": ([2, 3, 4], '#90EE90'),  # Light green
+                        #         "Summer": ([5, 6, 7], '#FFD700'),  # Gold
+                        #         "Autumn": ([8, 9, 10], '#D2691E'),  # Chocolate
+                        #         "Winter": ([11, 12, 1], '#87CEEB')   # Sky blue
+                        #     }
                             
-                            fig = go.Figure()
+                        #     fig = go.Figure()
                             
-                            for season, (months, color) in seasons.items():
-                                seasonal_data = df[df.index.month.isin(months)]
-                                if not seasonal_data.empty:
-                                    # Calculate hourly averages for the season
-                                    hourly_data = seasonal_data.groupby([seasonal_data.index.hour])[pollutant].mean()
-                                    hours = list(range(24))
+                        #     for season, (months, color) in seasons.items():
+                        #         seasonal_data = df[df.index.month.isin(months)]
+                        #         if not seasonal_data.empty:
+                        #             # Calculate hourly averages for the season
+                        #             hourly_data = seasonal_data.groupby([seasonal_data.index.hour])[pollutant].mean()
+                        #             hours = list(range(24))
                                     
-                                    fig.add_trace(go.Scatter(
-                                        x=hours,
-                                        y=[hourly_data.get(hour, None) for hour in hours],
-                                        name=f"{season}",
-                                        line=dict(color=color),
-                                        fill='tonexty',
-                                        fillcolor=f"rgba({int(color[1:3], 16)}, {int(color[3:5], 16)}, {int(color[5:7], 16)}, 0.1)"
-                                    ))
+                        #             fig.add_trace(go.Scatter(
+                        #                 x=hours,
+                        #                 y=[hourly_data.get(hour, None) for hour in hours],
+                        #                 name=f"{season}",
+                        #                 line=dict(color=color),
+                        #                 fill='tonexty',
+                        #                 fillcolor=f"rgba({int(color[1:3], 16)}, {int(color[3:5], 16)}, {int(color[5:7], 16)}, 0.1)"
+                        #             ))
                             
-                            fig.update_layout(
-                                title=f"Average Daily {pollutant} Patterns by Season for {location}",
-                                xaxis_title="Hour of Day",
-                                yaxis_title=f"{pollutant} Value",
-                                xaxis=dict(tickmode='array', ticktext=list(range(24)), tickvals=list(range(24))),
-                                showlegend=True,
-                                legend=dict(
-                                    orientation="h",
-                                    yanchor="bottom",
-                                    y=-0.3,
-                                    xanchor="center",
-                                    x=0.5
-                                ),
-                                hovermode='x unified'
-                            )
+                        #     fig.update_layout(
+                        #         title=f"Average Daily {pollutant} Patterns by Season for {location}",
+                        #         xaxis_title="Hour of Day",
+                        #         yaxis_title=f"{pollutant} Value",
+                        #         xaxis=dict(tickmode='array', ticktext=list(range(24)), tickvals=list(range(24))),
+                        #         showlegend=True,
+                        #         legend=dict(
+                        #             orientation="h",
+                        #             yanchor="bottom",
+                        #             y=-0.3,
+                        #             xanchor="center",
+                        #             x=0.5
+                        #         ),
+                        #         hovermode='x unified'
+                        #     )
                             
-                            return fig
+                        #     return fig
 
                         # Create seasonal charts for selected locations
                         # st.markdown("### Seasonal Patterns Analysis")
