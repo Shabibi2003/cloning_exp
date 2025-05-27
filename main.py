@@ -20,10 +20,8 @@ from PIL import Image
 import io
 from plotly.subplots import make_subplots
 import sqlite3
-from streamlit_autorefresh import st_autorefresh
 
-
-
+# Set page layout to wide and title
 st.set_page_config(
     page_title="Data Extraction and Visualization of IAQ Monitors",
     page_icon="📊",
@@ -34,8 +32,6 @@ st.set_page_config(
         'About': '# This is an **eQuest Utilities** application!'
     }
 )
-
-# Auto-refresh every 60 seconds
 
 st.markdown("""
     <h1 style='text-align: center; font-size: 34px; background: linear-gradient(90deg, green, green, green, green, green, green, green);
@@ -2485,7 +2481,6 @@ elif st.session_state.script_choice == 'device_data_comparison':
     
     st.markdown('<hr style="border:1px solid black">', unsafe_allow_html=True)
 
-
 st.markdown(
     """
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
@@ -2560,4 +2555,3 @@ st.markdown(
     """, unsafe_allow_html=True
 )
 st.markdown("<br>", unsafe_allow_html=True)
-st_autorefresh(interval=60 * 1000, key="refresh")
