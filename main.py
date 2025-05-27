@@ -2370,26 +2370,26 @@ elif st.session_state.script_choice == 'device_data_comparison':
                         for device_id, color, location in device_colors:
                             if location in processed_locations:
                                 # Query all available data for the device
-                                query = """
-                                SELECT datetime, {}
-                                FROM reading_db
-                                WHERE deviceID = %s
-                                ORDER BY datetime;
-                                """.format(pollutant_map[pollutant])
+                                # query = """
+                                # SELECT datetime, {}
+                                # FROM reading_db
+                                # WHERE deviceID = %s
+                                # ORDER BY datetime;
+                                # """.format(pollutant_map[pollutant])
                                 
-                                cursor.execute(query, (device_id,))
-                                rows = cursor.fetchall()
+                                # cursor.execute(query, (device_id,))
+                                # rows = cursor.fetchall()
                                 
-                                if rows:
-                                    df = pd.DataFrame(rows, columns=["datetime", pollutant_map[pollutant]])
-                                    df['datetime'] = pd.to_datetime(df['datetime'])
-                                    df = df[df[pollutant_map[pollutant]].notna()]
-                                    df = df[df[pollutant_map[pollutant]] != 0]
+                                
+                                # df = pd.DataFrame(rows, columns=["datetime", pollutant_map[pollutant]])
+                                # df['datetime'] = pd.to_datetime(df['datetime'])
+                                # df = df[df[pollutant_map[pollutant]].notna()]
+                                # df = df[df[pollutant_map[pollutant]] != 0]
                                     
-                                    if not df.empty:
-                                        df.set_index('datetime', inplace=True)
-                                        seasonal_fig = plot_seasonal_comparison(df, device_id, location, pollutant_map[pollutant])
-                                        st.plotly_chart(seasonal_fig, use_container_width=True)
+                                if not df.empty:
+                                    # df.set_index('datetime', inplace=True)
+                                    seasonal_fig = plot_seasonal_comparison(df, device_id, location, pollutant_map[pollutant])
+                                    st.plotly_chart(seasonal_fig, use_container_width=True)
 
                         # # Add seasonal chart section
                         # st.markdown("<h3 style='font-size:24px; text-align:left; font-weight:bold;'>Seasonal Analysis</h3>", unsafe_allow_html=True)
