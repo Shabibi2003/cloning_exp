@@ -37,13 +37,6 @@ st.set_page_config(
 
 # Auto-refresh every 60 seconds
 st_autorefresh(interval=60 * 1000, key="refresh")
-# Hide the Streamlit menu and footer
-hide_streamlit_style = """
-            <style>
-            #MainMenu {visibility: hidden;}
-            </style>
-            """
-st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 st.markdown("""
     <h1 style='text-align: center; font-size: 34px; background: linear-gradient(90deg, green, green, green, green, green, green, green);
