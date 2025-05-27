@@ -2216,6 +2216,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
                             unsafe_allow_html=True)
                     
                     # Fetch and plot data for each unique device
+                    st.write(f"Short Analysis for Minute by Minute Data")
                     for device_id, color, location in device_colors:
                         if location in processed_locations:
                             continue
@@ -2235,7 +2236,6 @@ elif st.session_state.script_choice == 'device_data_comparison':
                         rows = cursor.fetchall()
                         
                         # Debug print
-                        st.write(f"Short Analysis for Minute by Minute Data")
                         st.write(f"Found {len(rows)} data points for {location}.")
                         
                         if rows:
