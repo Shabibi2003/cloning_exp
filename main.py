@@ -2440,32 +2440,32 @@ elif st.session_state.script_choice == 'device_data_comparison':
                             return fig
 
                         # Create seasonal charts for selected locations
-                        st.markdown("### Seasonal Patterns Analysis")
-                        st.write("24-hour average patterns for each season, showing how values vary throughout the day.")
+                        # st.markdown("### Seasonal Patterns Analysis")
+                        # st.write("24-hour average patterns for each season, showing how values vary throughout the day.")
                         
-                        for device_id, color, location in device_colors:
-                            if location in processed_locations:
-                                # Query all available data for the device
-                                query = """
-                                SELECT datetime, {}
-                                FROM reading_db
-                                WHERE deviceID = %s
-                                ORDER BY datetime;
-                                """.format(pollutant_map[pollutant])
+                        # for device_id, color, location in device_colors:
+                        #     if location in processed_locations:
+                        #         # Query all available data for the device
+                        #         query = """
+                        #         SELECT datetime, {}
+                        #         FROM reading_db
+                        #         WHERE deviceID = %s
+                        #         ORDER BY datetime;
+                        #         """.format(pollutant_map[pollutant])
                                 
-                                cursor.execute(query, (device_id,))
-                                rows = cursor.fetchall()
+                        #         cursor.execute(query, (device_id,))
+                        #         rows = cursor.fetchall()
                                 
-                                if rows:
-                                    df = pd.DataFrame(rows, columns=["datetime", pollutant_map[pollutant]])
-                                    df['datetime'] = pd.to_datetime(df['datetime'])
-                                    df = df[df[pollutant_map[pollutant]].notna()]
-                                    df = df[df[pollutant_map[pollutant]] != 0]
+                        #         if rows:
+                        #             df = pd.DataFrame(rows, columns=["datetime", pollutant_map[pollutant]])
+                        #             df['datetime'] = pd.to_datetime(df['datetime'])
+                        #             df = df[df[pollutant_map[pollutant]].notna()]
+                        #             df = df[df[pollutant_map[pollutant]] != 0]
                                     
-                                    if not df.empty:
-                                        df.set_index('datetime', inplace=True)
-                                        seasonal_fig = plot_seasonal_comparison(df, device_id, location, pollutant_map[pollutant])
-                                        st.plotly_chart(seasonal_fig, use_container_width=True)
+                        #             if not df.empty:
+                        #                 df.set_index('datetime', inplace=True)
+                        #                 seasonal_fig = plot_seasonal_comparison(df, device_id, location, pollutant_map[pollutant])
+                        #                 st.plotly_chart(seasonal_fig, use_container_width=True)
                     else:
                         st.error("No valid data available for plotting. Please check your selection.")
                     
