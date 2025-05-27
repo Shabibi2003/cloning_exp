@@ -2391,9 +2391,9 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                         seasonal_fig = plot_seasonal_comparison(df, device_id, location, pollutant_map[pollutant])
                                         st.plotly_chart(seasonal_fig, use_container_width=True)
 
-                        # Add seasonal chart section
-                        st.markdown("<h3 style='font-size:24px; text-align:left; font-weight:bold;'>Seasonal Analysis</h3>", unsafe_allow_html=True)
-                        st.markdown("<br>", unsafe_allow_html=True)
+                        # # Add seasonal chart section
+                        # st.markdown("<h3 style='font-size:24px; text-align:left; font-weight:bold;'>Seasonal Analysis</h3>", unsafe_allow_html=True)
+                        # st.markdown("<br>", unsafe_allow_html=True)
 
                         # def plot_seasonal_comparison(df, device_id, location, pollutant):
                         #     seasons = {
