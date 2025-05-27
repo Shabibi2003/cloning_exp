@@ -35,7 +35,7 @@ st.set_page_config(
 
 # Add auto-refresh functionality 
 st.cache_data.clear()
-time.sleep(30)  # Small delay to prevent excessive refreshes
+time.sleep(80)  # Small delay to prevent excessive refreshes
 st.rerun()
 
 st.markdown("""
