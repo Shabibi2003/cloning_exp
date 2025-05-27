@@ -21,7 +21,7 @@ import io
 from plotly.subplots import make_subplots
 import sqlite3
 
-# Set page layout to wide and title
+
 st.set_page_config(
     page_title="Data Extraction and Visualization of IAQ Monitors",
     page_icon="📊",
@@ -32,6 +32,11 @@ st.set_page_config(
         'About': '# This is an **eQuest Utilities** application!'
     }
 )
+
+# Add auto-refresh functionality 
+st.cache_data.clear()
+time.sleep(30)  # Small delay to prevent excessive refreshes
+st.rerun()
 
 st.markdown("""
     <h1 style='text-align: center; font-size: 34px; background: linear-gradient(90deg, green, green, green, green, green, green, green);
