@@ -2316,15 +2316,17 @@ elif st.session_state.script_choice == 'device_data_comparison':
                         st.plotly_chart(fig_minute, use_container_width=True)
 
                         # Add seasonal chart section
-                        st.markdown("<h3 style='font-size:24px; text-align:left; font-weight:bold;'>Seasonal Analysis</h3>", unsafe_allow_html=True)
-                        st.markdown("<br>", unsafe_allow_html=True)
+                        # st.markdown("<h3 style='font-size:24px; text-align:left; font-weight:bold;'>Seasonal Analysis</h3>", unsafe_allow_html=True)
+                        # st.markdown("<br>", unsafe_allow_html=True)
 
                         def plot_seasonal_comparison(df, device_id, location, pollutant):
+
                             seasons = {
-                                "Spring": ([2, 3, 4], '#90EE90'),  # Light green
-                                "Summer": ([5, 6, 7], '#FFD700'),  # Gold
-                                "Autumn": ([8, 9, 10], '#D2691E'),  # Chocolate
-                                "Winter": ([11, 12, 1], '#87CEEB')   # Sky blue
+                                "Spring": ([3, 4], '#90EE90'),  # Light green
+                                "Summer": ([5, 6], '#FFD700'),  # Gold
+                                'Monsoon': ([7, 8,9], '#FFA500'),  # Orange
+                                "Autumn": ([9, 10], '#D2691E'),  # Chocolate
+                                "Winter": ([12, 1, 2], '#87CEEB')   # Sky blue
                             }
                             
                             fig = go.Figure()
@@ -2336,15 +2338,21 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                     hourly_data = seasonal_data.groupby([seasonal_data.index.hour])[pollutant].mean()
                                     hours = list(range(24))
                                     
+                                    # Convert hex to RGB for fillcolor
+                                    r = int(color[1:3], 16)
+                                    g = int(color[3:5], 16)
+                                    b = int(color[5:7], 16)
+                                    
                                     fig.add_trace(go.Scatter(
                                         x=hours,
                                         y=[hourly_data.get(hour, None) for hour in hours],
                                         name=f"{season}",
                                         line=dict(color=color),
                                         fill='tonexty',
-                                        fillcolor=f"rgba({int(color[1:3], 16)}, {int(color[3:5], 16)}, {int(color[5:7], 16)}, 0.1)"
+                                        fillcolor=f"rgba({r}, {g}, {b}, 0.1)"
                                     ))
                             
+                            # Rest of the layout code remains the same
                             fig.update_layout(
                                 title=f"Average Daily {pollutant} Patterns by Season for {location}",
                                 xaxis_title="Hour of Day",
@@ -2360,6 +2368,17 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                 ),
                                 hovermode='x unified'
                             )
+                            fig.add_annotation(
+                                text="Season Mapping: Spring (Mar–Apr), Summer (May–Jun), Monsoon (Jul–Sep), Autumn (Sep–Oct), Winter (Dec–Feb)",
+                                showarrow=False,
+                                xref='paper',
+                                yref='paper',
+                                x=0.5,
+                                y=-0.5,
+                                font=dict(size=12),
+                                xanchor='center'
+                            )
+
                             
                             return fig
 
@@ -2480,6 +2499,5 @@ st.markdown(
     """, unsafe_allow_html=True
 )
 st.markdown("<br>", unsafe_allow_html=True)
-
 
 
