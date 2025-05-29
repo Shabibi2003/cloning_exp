@@ -2368,6 +2368,17 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                 ),
                                 hovermode='x unified'
                             )
+                            fig.add_annotation(
+                                text="Season Mapping: Spring (Mar–Apr), Summer (May–Jun), Monsoon (Jul–Sep), Autumn (Sep–Oct), Winter (Dec–Feb)",
+                                showarrow=False,
+                                xref='paper',
+                                yref='paper',
+                                x=0.5,
+                                y=-0.35,
+                                font=dict(size=12),
+                                xanchor='center'
+                            )
+
                             
                             return fig
 
