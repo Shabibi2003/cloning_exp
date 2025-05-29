@@ -2379,7 +2379,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                             data=csv_buffer,
                                             file_name=f"{location}_{max_season}-{min_season}_seasonal.csv",
                                             mime='text/csv',
-                                            key=f"download_button_{location}_{season}"
+                                            key=f"export"
                                         )
 
                                     else:
