@@ -2340,7 +2340,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                     hourly_data = seasonal_data.groupby([seasonal_data.index.hour])[pollutant].mean()
 
                                     st.download_button(
-                                    label=f"Download {location} Seasonal CSV",
+                                    label=f"Download {location} {season} Seasonal CSV",
                                     data=seasonal_data.to_csv().encode('utf-8'),
                                     file_name=f"{location}_{season}seasonal.csv",
                                     mime="text/csv",
