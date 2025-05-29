@@ -2374,7 +2374,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                 xref='paper',
                                 yref='paper',
                                 x=0.5,
-                                y=-0.35,
+                                y=-0.5,
                                 font=dict(size=12),
                                 xanchor='center'
                             )
