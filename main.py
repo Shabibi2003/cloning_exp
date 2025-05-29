@@ -2321,10 +2321,11 @@ elif st.session_state.script_choice == 'device_data_comparison':
 
                         def plot_seasonal_comparison(df, device_id, location, pollutant):
                             seasons = {
-                                "Spring": ([2, 3, 4], '#90EE90'),  # Light green
-                                "Summer": ([5, 6, 7], '#FFD700'),  # Gold
-                                "Autumn": ([8, 9, 10], '#D2691E'),  # Chocolate
-                                "Winter": ([11, 12, 1], '#87CEEB')   # Sky blue
+                                "Spring": ([3, 4], '#90EE90'),  # Light green
+                                "Summer": ([5, 6], '#FFD700'),  # Gold
+                                'Monsoon': ([7, 8,9], '#FFA500'),  # Orange
+                                "Autumn": ([9, 10], '#D2691E'),  # Chocolate
+                                "Winter": ([12, 1, 2], '#87CEEB')   # Sky blue
                             }
                             
                             fig = go.Figure()
@@ -2342,7 +2343,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                         name=f"{season}",
                                         line=dict(color=color),
                                         fill='tonexty',
-                                        fillcolor=f"rgba({int(color[1:3], 16)}, {int(color[3:5], 16)}, {int(color[5:7], 16)}, 0.1)"
+                                        fillcolor=f"rgba({int(color[1:3], 16)}, {int(color[3:5], 16)}, {int(color[5:7], 16)},{int(color[7:9], 16)}, 0.1)"
                                     ))
                             
                             fig.update_layout(
