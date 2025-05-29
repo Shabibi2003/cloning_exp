@@ -2339,13 +2339,59 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                     
                                     hourly_data = seasonal_data.groupby([seasonal_data.index.hour])[pollutant].mean()
 
-                                    st.download_button(
-                                    label=f"Download {location} {season} Seasonal CSV",
-                                    data=hourly_data.to_csv().encode('utf-8'),
-                                    file_name=f"{location}_{season}seasonal.csv",
-                                    mime="text/csv",
-                                    key=f"download_button_{location}_{season}"
-                                    )
+                                    st.subheader("Downlaod Seasonal Csv")
+
+                                    season_months = {
+                                        "Spring": [3, 4],
+                                        "Summer": [5, 6],
+                                        "Monsoon": [7, 8, 9],
+                                        "Autumn": [9, 10],
+                                        "Winter": [12, 1, 2]
+                                    }
+
+                                    season_hourly_sums = {}
+                                    for season, months in season_months.items():
+                                        seasonal_data = df[df.index.month.isin(months)]
+                                        if not seasonal_data.empty:
+                                            hourly_sum = seasonal_data.groupby(df.index.hour)[pollutant].sum()
+                                            season_hourly_sums[season] = hourly_sum.reindex(range(24), fill_value=0)
+
+                                    if len(season_hourly_sums) >= 2:
+                                        season_totals = {s: d.sum() for s,d in season_hourly_sums.items()}
+                                        max_season = max(season_totals, key = season_totals.get)
+                                        min_season = min(season_totals, key = season_totals.get)
+                                        residual = season_hourly_sums[max_season] - season_hourly_sums[min_season]
+
+                                        csv_df = pd.DataFrame({
+                                            "Hour": list(range(24)),
+                                            f"{max_season}_Sum": season_hourly_sums[max_season].values,
+                                            f"{min_season}_Sum": season_hourly_sums[min_season].values,
+                                            "Residual": residual.values
+                                        })
+
+                                        csv_buffer = BytesIO()
+                                        csv_df.to_csv(csv_buffer, index = False)
+                                        csv_buffer.seek(0)
+
+                                        st.download_button(
+                                            label=f"Download {max_season} - {min_season}",
+                                            data=csv_buffer,
+                                            file_name=f"{location}_{max_season}-{min_season}_seasonal.csv",
+                                            mime='text/csv',
+                                            key=f"download_button_{location}_{season}"
+                                        )
+
+                                    else:
+                                        st.warning("Not enough seasonal data to compute Difference.")
+                                        
+
+                                    # st.download_button(
+                                    # label=f"Download {location} {season} Seasonal CSV",
+                                    # data=hourly_data.to_csv().encode('utf-8'),
+                                    # file_name=f"{location}_{season}seasonal.csv",
+                                    # mime="text/csv",
+                                    # key=f"download_button_{location}_{season}"
+                                    # )
 
                                     hours = list(range(24))
                                     
