@@ -2320,6 +2320,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
                         st.markdown("<br>", unsafe_allow_html=True)
 
                         def plot_seasonal_comparison(df, device_id, location, pollutant):
+
                             seasons = {
                                 "Spring": ([3, 4], '#90EE90'),  # Light green
                                 "Summer": ([5, 6], '#FFD700'),  # Gold
@@ -2337,15 +2338,21 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                     hourly_data = seasonal_data.groupby([seasonal_data.index.hour])[pollutant].mean()
                                     hours = list(range(24))
                                     
+                                    # Convert hex to RGB for fillcolor
+                                    r = int(color[1:3], 16)
+                                    g = int(color[3:5], 16)
+                                    b = int(color[5:7], 16)
+                                    
                                     fig.add_trace(go.Scatter(
                                         x=hours,
                                         y=[hourly_data.get(hour, None) for hour in hours],
                                         name=f"{season}",
                                         line=dict(color=color),
                                         fill='tonexty',
-                                        fillcolor=f"rgba({int(color[1:3], 16)}, {int(color[3:5], 16)}, {int(color[5:7], 16)},{int(color[7:9], 16)}, 0.1)"
+                                        fillcolor=f"rgba({r}, {g}, {b}, 0.1)"
                                     ))
                             
+                            # Rest of the layout code remains the same
                             fig.update_layout(
                                 title=f"Average Daily {pollutant} Patterns by Season for {location}",
                                 xaxis_title="Hour of Day",
