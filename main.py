@@ -2409,6 +2409,63 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                         df.set_index('datetime', inplace=True)
                                         seasonal_fig = plot_seasonal_comparison(df, device_id, location, pollutant_map[pollutant])
                                         st.plotly_chart(seasonal_fig, use_container_width=True)
+                                        
+                                        # Add button for Excel generation
+                                        if st.button(f"Generate Seasonal Analysis Excel for {location}"):
+                                            # Get seasonal data
+                                            seasons_data = {}
+                                            for season, (months, _) in seasons.items():
+                                                seasonal_data = df[df.index.month.isin(months)]
+                                                if not seasonal_data.empty:
+                                                    # Calculate hourly averages for the season
+                                                    hourly_data = seasonal_data.groupby([seasonal_data.index.hour])[pollutant_map[pollutant]].mean()
+                                                    seasons_data[season] = hourly_data
+                                            
+                                            # Calculate summer total
+                                            summer_total = seasons_data['Summer'].sum() if 'Summer' in seasons_data else 0
+                                            
+                                            # Find max and min seasons based on total hourly values
+                                            season_totals = {season: data.sum() for season, data in seasons_data.items()}
+                                            max_season = max(season_totals.items(), key=lambda x: x[1])[0]
+                                            min_season = min(season_totals.items(), key=lambda x: x[1])[0]
+                                            
+                                            # Calculate residuals
+                                            residuals = seasons_data[max_season] - seasons_data[min_season]
+                                            
+                                            # Create Excel with pandas
+                                            output = BytesIO()
+                                            with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+                                                # Create hourly values sheet
+                                                hourly_df = pd.DataFrame(seasons_data)
+                                                hourly_df.index.name = 'Hour'
+                                                hourly_df.to_excel(writer, sheet_name='Hourly Values')
+                                                
+                                                # Create summary sheet
+                                                summary_data = {
+                                                    'Summer Total': [summer_total],
+                                                    'Max Season': [f"{max_season} ({season_totals[max_season]:.2f})"],
+                                                    'Min Season': [f"{min_season} ({season_totals[min_season]:.2f})"],
+                                                }
+                                                summary_df = pd.DataFrame(summary_data)
+                                                summary_df.to_excel(writer, sheet_name='Summary')
+                                                
+                                                # Create residuals sheet
+                                                residuals_df = pd.DataFrame({
+                                                    'Hour': range(24),
+                                                    'Residual': residuals
+                                                })
+                                                residuals_df.to_excel(writer, sheet_name='Residuals', index=False)
+                                            
+                                            # Generate download button
+                                            output.seek(0)
+                                            st.download_button(
+                                                label="Download Excel file",
+                                                data=output,
+                                                file_name=f"seasonal_analysis_{location}_{pollutant_map[pollutant]}.xlsx",
+                                                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                            )
+                                            
+                                            st.success("Excel file generated successfully!")
 
                     else:
                         st.error("No valid data available for plotting. Please check your selection.")
