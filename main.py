@@ -2353,8 +2353,9 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                     for season, months in season_months.items():
                                         seasonal_data = df[df.index.month.isin(months)]
                                         if not seasonal_data.empty:
-                                            hourly_sum = seasonal_data.groupby(df.index.hour)[pollutant].sum()
+                                            hourly_sum = seasonal_data[pollutant].groupby(seasonal_data.index.hour).sum()
                                             season_hourly_sums[season] = hourly_sum.reindex(range(24), fill_value=0)
+
 
                                     if len(season_hourly_sums) >= 2:
                                         season_totals = {s: d.sum() for s,d in season_hourly_sums.items()}
