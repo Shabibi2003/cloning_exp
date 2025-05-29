@@ -2333,17 +2333,19 @@ elif st.session_state.script_choice == 'device_data_comparison':
                             
                             for season, (months, color) in seasons.items():
                                 seasonal_data = df[df.index.month.isin(months)]
-                                st.download_button(
-                                    label=f"Download {location} Seasonal CSV",
-                                    data=seasonal_data.to_csv().encode('utf-8'),
-                                    file_name=f"{location}_seasonal.csv",
-                                    mime="text/csv",
-                                    key=f"download_button_{location}_{season}"
-
-                                )
+                                
                                 if not seasonal_data.empty:
                                     # Calculate hourly averages for the season
+                                    
                                     hourly_data = seasonal_data.groupby([seasonal_data.index.hour])[pollutant].mean()
+
+                                    st.download_button(
+                                    label=f"Download {location} Seasonal CSV",
+                                    data=seasonal_data.to_csv().encode('utf-8'),
+                                    file_name=f"{location}_{season}seasonal.csv",
+                                    mime="text/csv",
+                                    key=f"download_button_{location}_{season}"
+                                    )
 
                                     hours = list(range(24))
                                     
