@@ -2341,7 +2341,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
 
                                     st.download_button(
                                     label=f"Download {location} {season} Seasonal CSV",
-                                    data=seasonal_data.to_csv().encode('utf-8'),
+                                    data=hourly_data.to_csv().encode('utf-8'),
                                     file_name=f"{location}_{season}seasonal.csv",
                                     mime="text/csv",
                                     key=f"download_button_{location}_{season}"
