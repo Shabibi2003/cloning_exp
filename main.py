@@ -2412,60 +2412,70 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                         
                                         # Add button for Excel generation
                                         if st.button(f"Generate Seasonal Analysis Excel for {location}"):
-                                            # Get seasonal data
-                                            seasons_data = {}
-                                            for season, (months, _) in seasons.items():
-                                                seasonal_data = df[df.index.month.isin(months)]
-                                                if not seasonal_data.empty:
-                                                    # Calculate hourly averages for the season
-                                                    hourly_data = seasonal_data.groupby([seasonal_data.index.hour])[pollutant_map[pollutant]].mean()
-                                                    seasons_data[season] = hourly_data
-                                            
-                                            # Calculate summer total
-                                            summer_total = seasons_data['Summer'].sum() if 'Summer' in seasons_data else 0
-                                            
-                                            # Find max and min seasons based on total hourly values
-                                            season_totals = {season: data.sum() for season, data in seasons_data.items()}
-                                            max_season = max(season_totals.items(), key=lambda x: x[1])[0]
-                                            min_season = min(season_totals.items(), key=lambda x: x[1])[0]
-                                            
-                                            # Calculate residuals
-                                            residuals = seasons_data[max_season] - seasons_data[min_season]
-                                            
-                                            # Create Excel with pandas
-                                            output = BytesIO()
-                                            with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-                                                # Create hourly values sheet
+                                            try:
+                                                # Get seasonal data
+                                                seasons_data = {}
+                                                for season, (months, _) in seasons.items():
+                                                    seasonal_data = df[df.index.month.isin(months)]
+                                                    if not seasonal_data.empty:
+                                                        # Calculate hourly averages for the season
+                                                        hourly_data = seasonal_data.groupby([seasonal_data.index.hour])[pollutant].mean()
+                                                        seasons_data[season] = hourly_data
+                                                
+                                                # Calculate summer total
+                                                summer_total = seasons_data['Summer'].sum() if 'Summer' in seasons_data else 0
+                                                
+                                                # Find max and min seasons based on total hourly values
+                                                season_totals = {season: data.sum() for season, data in seasons_data.items()}
+                                                max_season = max(season_totals.items(), key=lambda x: x[1])[0]
+                                                min_season = min(season_totals.items(), key=lambda x: x[1])[0]
+                                                
+                                                # Calculate residuals
+                                                residuals = seasons_data[max_season] - seasons_data[min_season]
+                                                
+                                                # Create DataFrame for hourly values
                                                 hourly_df = pd.DataFrame(seasons_data)
                                                 hourly_df.index.name = 'Hour'
-                                                hourly_df.to_excel(writer, sheet_name='Hourly Values')
                                                 
-                                                # Create summary sheet
+                                                # Create summary DataFrame
                                                 summary_data = {
-                                                    'Summer Total': [summer_total],
-                                                    'Max Season': [f"{max_season} ({season_totals[max_season]:.2f})"],
-                                                    'Min Season': [f"{min_season} ({season_totals[min_season]:.2f})"],
+                                                    'Metric': ['Summer Total', 'Max Season', 'Min Season'],
+                                                    'Value': [
+                                                        f"{summer_total:.2f}",
+                                                        f"{max_season} ({season_totals[max_season]:.2f})",
+                                                        f"{min_season} ({season_totals[min_season]:.2f})"
+                                                    ]
                                                 }
                                                 summary_df = pd.DataFrame(summary_data)
-                                                summary_df.to_excel(writer, sheet_name='Summary')
                                                 
-                                                # Create residuals sheet
+                                                # Create residuals DataFrame
                                                 residuals_df = pd.DataFrame({
                                                     'Hour': range(24),
-                                                    'Residual': residuals
+                                                    'Residual': residuals.values
                                                 })
-                                                residuals_df.to_excel(writer, sheet_name='Residuals', index=False)
-                                            
-                                            # Generate download button
-                                            output.seek(0)
-                                            st.download_button(
-                                                label="Download Excel file",
-                                                data=output,
-                                                file_name=f"seasonal_analysis_{location}_{pollutant_map[pollutant]}.xlsx",
-                                                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                                            )
-                                            
-                                            st.success("Excel file generated successfully!")
+                                                
+                                                # Create Excel file in memory
+                                                output = BytesIO()
+                                                with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+                                                    hourly_df.to_excel(writer, sheet_name='Hourly Values')
+                                                    summary_df.to_excel(writer, sheet_name='Summary', index=False)
+                                                    residuals_df.to_excel(writer, sheet_name='Residuals', index=False)
+                                                
+                                                # Prepare the file for download
+                                                output.seek(0)
+                                                excel_data = output.getvalue()
+                                                
+                                                # Create download button
+                                                st.download_button(
+                                                    label="📥 Download Excel Analysis",
+                                                    data=excel_data,
+                                                    file_name=f"seasonal_analysis_{location}_{pollutant}.xlsx",
+                                                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                                )
+                                                
+                                                st.success("✅ Excel file generated successfully! Click the download button above to save it.")
+                                            except Exception as e:
+                                                st.error(f"Error generating Excel file: {str(e)}")
 
                     else:
                         st.error("No valid data available for plotting. Please check your selection.")
