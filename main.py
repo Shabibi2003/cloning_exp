@@ -2336,7 +2336,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                 if not seasonal_data.empty:
                                     # Calculate hourly averages for the season
                                     hourly_data = seasonal_data.groupby([seasonal_data.index.hour])[pollutant].mean()
-                                    hours = list(range(24))
+                                    hours = list(range(1,24))
                                     
                                     # Convert hex to RGB for fillcolor
                                     r = int(color[1:3], 16)
@@ -2357,7 +2357,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                 title=f"Average Daily {pollutant} Patterns by Season for {location}",
                                 xaxis_title="Hour of Day",
                                 yaxis_title=f"{pollutant} Value",
-                                xaxis=dict(tickmode='array', ticktext=list(range(24)), tickvals=list(range(24))),
+                                xaxis=dict(tickmode='array', ticktext=list(range(1,24)), tickvals=list(range(1,24))),
                                 showlegend=True,
                                 legend=dict(
                                     orientation="h",
