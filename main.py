@@ -2319,7 +2319,6 @@ elif st.session_state.script_choice == 'device_data_comparison':
                         # st.markdown("<h3 style='font-size:24px; text-align:left; font-weight:bold;'>Seasonal Analysis</h3>", unsafe_allow_html=True)
                         # st.markdown("<br>", unsafe_allow_html=True)
                         def plot_seasonal_comparison(df, device_id, location, pollutant):
-
                             seasons = {
                                 "Spring": ([3, 4], '#90EE90'),  # Light green
                                 "Summer": ([5, 6], '#FFD700'),  # Gold
@@ -2329,11 +2328,15 @@ elif st.session_state.script_choice == 'device_data_comparison':
                             }
 
                             fig = go.Figure()
+                            
+                            # Create a dictionary to store hourly data for all seasons
+                            all_seasons_data = {}
 
                             for season, (months, color) in seasons.items():
                                 seasonal_data = df[df.index.month.isin(months)]
                                 if not seasonal_data.empty:
                                     hourly_data = seasonal_data[pollutant].groupby(seasonal_data.index.hour).mean()
+                                    all_seasons_data[season] = hourly_data
 
                                     hours = list(range(24))
                                     r = int(color[1:3], 16)
@@ -2376,16 +2379,23 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                 xanchor='center'
                             )
 
-                            # button to download csv file for each season
+                            # Create a DataFrame for download
+                            download_data = pd.DataFrame()
+                            for season in all_seasons_data:
+                                download_data[season] = [all_seasons_data[season].get(hour, None) for hour in range(24)]
+                            download_data.index = range(24)
+                            download_data.index.name = 'Hour'
+                            
+                            # Add download button using streamlit
+                            csv = download_data.to_csv()
                             st.download_button(
-                                    label=f"Download {location} {season} CSV",
-                                    data=hourly_data.to_csv().encode('utf-8'),
-                                    file_name=f"{location}_{season}.csv",
-                                    mime="text/csv"
-                                )
+                                label=f"Download {location} Hourly Data",
+                                data=csv,
+                                file_name=f"{location}_{pollutant}_seasonal_hourly_data.csv",
+                                mime='text/csv',
+                            )
 
                             return fig
-
 
                         # Create seasonal charts for selected locations
                         st.markdown("### Seasonal Patterns Analysis")
