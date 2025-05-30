@@ -2329,22 +2329,11 @@ elif st.session_state.script_choice == 'device_data_comparison':
                             }
 
                             fig = go.Figure()
-                            season_hourly_sums = {}
 
                             for season, (months, color) in seasons.items():
                                 seasonal_data = df[df.index.month.isin(months)]
                                 if not seasonal_data.empty:
                                     hourly_data = seasonal_data[pollutant].groupby(seasonal_data.index.hour).mean()
-                                    hourly_sum = seasonal_data[pollutant].groupby(seasonal_data.index.hour).sum()
-                                    season_hourly_sums[season] = hourly_sum.reindex(range(24), fill_value=0)
-
-                                    # button to download csv file for each season
-                                    st.download_button(
-                                        label=f"Download {location} {season} CSV",
-                                        data=seasonal_data.to_csv().encode('utf-8'),
-                                        file_name=f"{location}_{season}.csv",
-                                        mime="text/csv"
-                                    )
 
                                     hours = list(range(24))
                                     r = int(color[1:3], 16)
@@ -2386,6 +2375,14 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                 font=dict(size=12),
                                 xanchor='center'
                             )
+
+                            # button to download csv file for each season
+                            st.download_button(
+                                    label=f"Download {location} {season} CSV",
+                                    data=hourly_data.to_csv().encode('utf-8'),
+                                    file_name=f"{location}_{season}.csv",
+                                    mime="text/csv"
+                                )
 
                             return fig
 
