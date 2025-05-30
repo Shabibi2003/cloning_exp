@@ -2318,9 +2318,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
                         # Add seasonal chart section
                         # st.markdown("<h3 style='font-size:24px; text-align:left; font-weight:bold;'>Seasonal Analysis</h3>", unsafe_allow_html=True)
                         # st.markdown("<br>", unsafe_allow_html=True)
-
                         def plot_seasonal_comparison(df, device_id, location, pollutant):
-                            
 
                             seasons = {
                                 "Spring": ([3, 4], '#90EE90'),  # Light green
@@ -2390,10 +2388,10 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                 residual = season_hourly_sums[max_season] - season_hourly_sums[min_season]
 
                                 csv_df = pd.DataFrame({
-                                    "Hour": list(range(24)),
-                                    f"{max_season}_Sum": season_hourly_sums[max_season].values,
-                                    f"{min_season}_Sum": season_hourly_sums[min_season].values,
-                                    "Residual": residual.values
+                                    "hour": list(range(24)),
+                                    f"{max_season.lower()}_{pollutant.lower()}": season_hourly_sums[max_season].round(8).values,
+                                    f"{min_season.lower()}_{pollutant.lower()}": season_hourly_sums[min_season].round(8).values,
+                                    "difference": residual.round(8).values
                                 })
 
                                 csv_buffer = BytesIO()
@@ -2401,16 +2399,17 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                 csv_buffer.seek(0)
 
                                 st.download_button(
-                                    label=f"Download {max_season} - {min_season} Residual CSV",
+                                    label=f"Download {max_season} vs {min_season} Residual CSV",
                                     data=csv_buffer,
-                                    file_name=f"{location}_{max_season}-{min_season}_residual.csv",
+                                    file_name=f"{location}_{max_season}_vs_{min_season}_residual.csv",
                                     mime='text/csv',
                                     key=f"download_btn_{location}_{max_season}_{min_season}"
                                 )
                             else:
-                                st.warning("Not enough seasonal data to compute Difference.")
+                                st.warning("Not enough seasonal data to compute differences.")
 
                             return fig
+
 
                         # Create seasonal charts for selected locations
                         st.markdown("### Seasonal Patterns Analysis")
