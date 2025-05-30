@@ -2330,8 +2330,6 @@ elif st.session_state.script_choice == 'device_data_comparison':
 
                             fig = go.Figure()
                             season_hourly_sums = {}
-                            season_total_sums = {}
-
 
                             for season, (months, color) in seasons.items():
                                 seasonal_data = df[df.index.month.isin(months)]
@@ -2381,20 +2379,6 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                 xanchor='center'
                             )
 
-                            max_season = max(season_total_sums, key=season_total_sums.get)
-                            min_season = min(season_total_sums, key=season_total_sums.get)
-                            
-                            comparison_df = pd.DataFrame({
-                                "Hour": list(range(24)),
-                                f"{max_season}": season_hourly_sums[max_season].values,
-                                f"{min_season}": season_hourly_sums[min_season].values,
-                                "Difference": (season_hourly_sums[max_season].values - season_hourly_sums[min_season].values).round(4)
-                            })
-
-                            file_name = f"seasonal_comparison_{device_id}_{location}_{pollutant}.csv"
-                            comparison_df.to_csv(file_name, index=False)
-                            print(f"Seasonal comparison CSV saved as {file_name}")
-
                             # st.subheader("Download Seasonal Residual CSV")
 
                             # if len(season_hourly_sums) >= 2:
@@ -2424,7 +2408,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
                             # else:
                             #     st.warning("Not enough seasonal data to compute differences.")
 
-                            return fig, comparison_df
+                            return fig
 
 
                         # Create seasonal charts for selected locations
