@@ -2330,6 +2330,8 @@ elif st.session_state.script_choice == 'device_data_comparison':
 
                             fig = go.Figure()
                             season_hourly_sums = {}
+                            season_total_sums = {}
+
 
                             for season, (months, color) in seasons.items():
                                 seasonal_data = df[df.index.month.isin(months)]
