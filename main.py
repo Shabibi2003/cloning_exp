@@ -2320,87 +2320,31 @@ elif st.session_state.script_choice == 'device_data_comparison':
                         # st.markdown("<br>", unsafe_allow_html=True)
 
                         def plot_seasonal_comparison(df, device_id, location, pollutant):
+                            
 
                             seasons = {
                                 "Spring": ([3, 4], '#90EE90'),  # Light green
                                 "Summer": ([5, 6], '#FFD700'),  # Gold
-                                'Monsoon': ([7, 8,9], '#FFA500'),  # Orange
+                                "Monsoon": ([7, 8, 9], '#FFA500'),  # Orange
                                 "Autumn": ([9, 10], '#D2691E'),  # Chocolate
-                                "Winter": ([12, 1, 2], '#87CEEB')   # Sky blue
+                                "Winter": ([12, 1, 2], '#87CEEB')  # Sky blue
                             }
-                            
+
                             fig = go.Figure()
-                            
+                            season_hourly_sums = {}
+
                             for season, (months, color) in seasons.items():
                                 seasonal_data = df[df.index.month.isin(months)]
-                                
                                 if not seasonal_data.empty:
-                                    # Calculate hourly averages for the season
-                                    
-                                    hourly_data = seasonal_data.groupby([seasonal_data.index.hour])[pollutant].mean()
-
-                                    # st.subheader("Downlaod Seasonal Csv")
-
-                                    # season_months = {
-                                    #     "Spring": [3, 4],
-                                    #     "Summer": [5, 6],
-                                    #     "Monsoon": [7, 8, 9],
-                                    #     "Autumn": [9, 10],
-                                    #     "Winter": [12, 1, 2]
-                                    # }
-
-                                    # season_hourly_sums = {}
-                                    # for season, months in season_months.items():
-                                    #     seasonal_data = df[df.index.month.isin(months)]
-                                    #     if not seasonal_data.empty:
-                                    #         hourly_sum = seasonal_data[pollutant].groupby(seasonal_data.index.hour).sum()
-                                    #         season_hourly_sums[season] = hourly_sum.reindex(range(24), fill_value=0)
-
-
-                                    # if len(season_hourly_sums) >= 2:
-                                    #     season_totals = {s: d.sum() for s,d in season_hourly_sums.items()}
-                                    #     max_season = max(season_totals, key = season_totals.get)
-                                    #     min_season = min(season_totals, key = season_totals.get)
-                                    #     residual = season_hourly_sums[max_season] - season_hourly_sums[min_season]
-
-                                    #     csv_df = pd.DataFrame({
-                                    #         "Hour": list(range(24)),
-                                    #         f"{max_season}_Sum": season_hourly_sums[max_season].values,
-                                    #         f"{min_season}_Sum": season_hourly_sums[min_season].values,
-                                    #         "Residual": residual.values
-                                    #     })
-
-                                    #     csv_buffer = BytesIO()
-                                    #     csv_df.to_csv(csv_buffer, index = False)
-                                    #     csv_buffer.seek(0)
-
-                                    #     st.download_button(
-                                    #         label=f"Download {max_season} - {min_season}",
-                                    #         data=csv_buffer,
-                                    #         file_name=f"{location}_{max_season}-{min_season}_seasonal.csv",
-                                    #         mime='text/csv',
-                                    #         key=f"export{location}_{season}"
-                                    #     )
-
-                                    # else:
-                                    #     st.warning("Not enough seasonal data to compute Difference.")
-                                        
-
-                                    # st.download_button(
-                                    # label=f"Download {location} {season} Seasonal CSV",
-                                    # data=hourly_data.to_csv().encode('utf-8'),
-                                    # file_name=f"{location}_{season}seasonal.csv",
-                                    # mime="text/csv",
-                                    # key=f"download_button_{location}_{season}"
-                                    # )
+                                    hourly_data = seasonal_data[pollutant].groupby(seasonal_data.index.hour).mean()
+                                    hourly_sum = seasonal_data[pollutant].groupby(seasonal_data.index.hour).sum()
+                                    season_hourly_sums[season] = hourly_sum.reindex(range(24), fill_value=0)
 
                                     hours = list(range(24))
-                                    
-                                    # Convert hex to RGB for fillcolor
                                     r = int(color[1:3], 16)
                                     g = int(color[3:5], 16)
                                     b = int(color[5:7], 16)
-                                    
+
                                     fig.add_trace(go.Scatter(
                                         x=hours,
                                         y=[hourly_data.get(hour, None) for hour in hours],
@@ -2409,8 +2353,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                         fill='tonexty',
                                         fillcolor=f"rgba({r}, {g}, {b}, 0.1)"
                                     ))
-                            
-                            # Rest of the layout code remains the same
+
                             fig.update_layout(
                                 title=f"Average Daily {pollutant} Patterns by Season for {location}",
                                 xaxis_title="Hour of Day",
@@ -2426,6 +2369,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                 ),
                                 hovermode='x unified'
                             )
+
                             fig.add_annotation(
                                 text="Season Mapping: Spring (Mar–Apr), Summer (May–Jun), Monsoon (Jul–Sep), Autumn (Sep–Oct), Winter (Dec–Feb)",
                                 showarrow=False,
@@ -2437,7 +2381,35 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                 xanchor='center'
                             )
 
-                            
+                            st.subheader("Download Seasonal Residual CSV")
+
+                            if len(season_hourly_sums) >= 2:
+                                season_totals = {s: d.sum() for s, d in season_hourly_sums.items()}
+                                max_season = max(season_totals, key=season_totals.get)
+                                min_season = min(season_totals, key=season_totals.get)
+                                residual = season_hourly_sums[max_season] - season_hourly_sums[min_season]
+
+                                csv_df = pd.DataFrame({
+                                    "Hour": list(range(24)),
+                                    f"{max_season}_Sum": season_hourly_sums[max_season].values,
+                                    f"{min_season}_Sum": season_hourly_sums[min_season].values,
+                                    "Residual": residual.values
+                                })
+
+                                csv_buffer = BytesIO()
+                                csv_df.to_csv(csv_buffer, index=False)
+                                csv_buffer.seek(0)
+
+                                st.download_button(
+                                    label=f"Download {max_season} - {min_season} Residual CSV",
+                                    data=csv_buffer,
+                                    file_name=f"{location}_{max_season}-{min_season}_residual.csv",
+                                    mime='text/csv',
+                                    key=f"download_btn_{location}_{max_season}_{min_season}"
+                                )
+                            else:
+                                st.warning("Not enough seasonal data to compute Difference.")
+
                             return fig
 
                         # Create seasonal charts for selected locations
