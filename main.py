@@ -2323,7 +2323,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                 "Spring": ([3, 4], '#90EE90'),  # Light green
                                 "Summer": ([5, 6], '#FFD700'),  # Gold
                                 "Monsoon": ([7, 8, 9], '#FFA500'),  # Orange
-                                "Autumn": ([9, 10], '#D2691E'),  # Chocolate
+                                "Autumn": ([10, 11], '#D2691E'),  # Chocolate
                                 "Winter": ([12, 1, 2], '#87CEEB')  # Sky blue
                             }
 
