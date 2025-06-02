@@ -2336,6 +2336,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
 
                             for season, (months, color) in seasons.items():
                                 seasonal_data = df[df.index.month.isin(months)]
+                                seasonal_data = seasonal_data[seasonal_data[pollutant] != 0]
                                 if not seasonal_data.empty:
                                     hourly_data = seasonal_data[pollutant].groupby(seasonal_data.index.hour).mean()
                                     all_seasons_data[season] = hourly_data
