@@ -2320,12 +2320,14 @@ elif st.session_state.script_choice == 'device_data_comparison':
                         # st.markdown("<br>", unsafe_allow_html=True)
                         def plot_seasonal_comparison(df, device_id, location, pollutant):
                             seasons = {
-                                "Spring": ([3, 4], '#90EE90'),  # Light green
-                                "Summer": ([5, 6], '#FFD700'),  # Gold
-                                "Monsoon": ([7, 8, 9], '#FFA500'),  # Orange
-                                "Autumn": ([10, 11], '#D2691E'),  # Chocolate
-                                "Winter": ([12, 1, 2], '#87CEEB')  # Sky blue
+                                "Spring": ([3, 4], '#90EE90'),      # March, April
+                                "Summer": ([5, 6], '#FFD700'),      # May, June
+                                "Monsoon": ([7, 8, 9], '#FFA500'),  # July, August, September
+                                "Autumn": ([10, 11], '#D2691E'),    # October, November
+                                "Winter": ([12, 1, 2], '#87CEEB')   # December, January, February
                             }
+
+
 
                             fig = go.Figure()
                             
@@ -2368,8 +2370,10 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                 hovermode='x unified'
                             )
 
+
+
                             fig.add_annotation(
-                                text="Season Mapping: Spring (Mar–Apr), Summer (May–Jun), Monsoon (Jul–Sep), Autumn (Sep–Oct), Winter (Dec–Feb)",
+                                text="Season Mapping: Spring (Mar–Apr), Summer (May–Jun), Monsoon (Jul–Sep), Autumn (Oct–Nov), Winter (Dec–Feb)",
                                 showarrow=False,
                                 xref='paper',
                                 yref='paper',
@@ -2378,6 +2382,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                 font=dict(size=12),
                                 xanchor='center'
                             )
+
 
                             # Create a DataFrame for download
                             download_data = pd.DataFrame()
