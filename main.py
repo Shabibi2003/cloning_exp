@@ -2341,6 +2341,15 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                     hourly_data = seasonal_data[pollutant].groupby(seasonal_data.index.hour).mean()
                                     all_seasons_data[season] = hourly_data
 
+                                    csv0 = hourly_data.to_csv()
+                                    st.download_button(
+                                        label=f"Download {location} Hourly Data",
+                                        data=csv0,
+                                        file_name=f"{location}_{pollutant}_seasonal_hourly_data.csv",
+                                        mime='text/csv',
+                                        key = 'csv_download'
+                                    )
+
                                     hours = list(range(24))
                                     r = int(color[1:3], 16)
                                     g = int(color[3:5], 16)
