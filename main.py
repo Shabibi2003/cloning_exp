@@ -2392,6 +2392,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                 data=csv0,
                                 file_name=f"{location}_{pollutant}_seasonal_hourly_data.csv",
                                 mime='text/csv',
+                                key=f"{location}_{pollutant}_seasonal_hourly_data.csv"
                             )
 
 
