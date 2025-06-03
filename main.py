@@ -2327,32 +2327,20 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                 "Winter": ([12, 1, 2], '#87CEEB')   # December, January, February
                             }
 
+
+
                             fig = go.Figure()
                             
                             # Create a dictionary to store hourly data for all seasons
                             all_seasons_data = {}
 
                             for season, (months, color) in seasons.items():
-                                # Filter data for the current season
                                 seasonal_data = df[df.index.month.isin(months)]
-                                # Remove zero and invalid values
-                                seasonal_data = seasonal_data[
-                                    (seasonal_data[pollutant] != 0) & 
-                                    (seasonal_data[pollutant].notna()) & 
-                                    (seasonal_data[pollutant] > 0)
-                                ]
-                                
+                                seasonal_data = seasonal_data[seasonal_data[pollutant] != 0]
                                 if not seasonal_data.empty:
-                                    # Calculate hourly averages with more robust aggregation
-                                    hourly_stats = seasonal_data[pollutant].groupby(seasonal_data.index.hour).agg([
-                                        ('mean', 'mean'),
-                                        ('count', 'count')
-                                    ])
-                                    
-                                    # Only keep hours with sufficient data points (at least 5 readings)
-                                    valid_hours = hourly_stats[hourly_stats['count'] >= 5]
-                                    hourly_data = valid_hours['mean']
+                                    hourly_data = seasonal_data[pollutant].groupby(seasonal_data.index.hour).mean()
                                     all_seasons_data[season] = hourly_data
+
 
                                     hours = list(range(24))
                                     r = int(color[1:3], 16)
@@ -2365,11 +2353,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                         name=f"{season}",
                                         line=dict(color=color),
                                         fill='tonexty',
-                                        fillcolor=f"rgba({r}, {g}, {b}, 0.1)",
-                                        hovertemplate=f"{season}<br>" +
-                                                    "Hour: %{x}<br>" +
-                                                    f"{pollutant}: %{{y:.2f}}<br>" +
-                                                    "<extra></extra>"
+                                        fillcolor=f"rgba({r}, {g}, {b}, 0.1)"
                                     ))
 
                             fig.update_layout(
@@ -2388,6 +2372,8 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                 hovermode='x unified'
                             )
 
+
+
                             fig.add_annotation(
                                 text="Season Mapping: Spring (Mar–Apr), Summer (May–Jun), Monsoon (Jul–Sep), Autumn (Oct–Nov), Winter (Dec–Feb)",
                                 showarrow=False,
@@ -2398,6 +2384,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                 font=dict(size=12),
                                 xanchor='center'
                             )
+
 
                             # Create a DataFrame for download
                             download_data = pd.DataFrame()
@@ -2416,6 +2403,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
                             )
 
                             return fig
+
                         # Create seasonal charts for selected locations
                         st.markdown("### Seasonal Patterns Analysis")
                         st.write("24-hour average patterns for each season, showing how values vary throughout the day.")
