@@ -2110,7 +2110,8 @@ elif st.session_state.script_choice == 'device_data_comparison':
         '1202240029': ("St. Mary's School", 'Office'),
         '1202240028': ('St. Marys School', 'Office'),
         '1202240010': ('St. Marys School', 'Office'),
-        '1202240012': ('St. Marys School', 'Office')
+        '1202240012': ('St. Marys School', 'Office'),
+        '1203240072': ('Metacity Office','Office')
 
     }
     
