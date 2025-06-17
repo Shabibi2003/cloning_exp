@@ -2258,13 +2258,13 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                 df_hourly = df.resample('H').mean().dropna()
 
 
-                                # generate button for download both csv
-                                # st.download_button(
-                                #     label=f"Download {location} Minute by Minute CSV",
-                                #     data=df.to_csv().encode('utf-8'),
-                                #     file_name=f"{location}_minute.csv",
-                                #     mime="text/csv"
-                                # )
+                                generate button for download both csv
+                                st.download_button(
+                                    label=f"Download {location} Minute by Minute CSV",
+                                    data=df.to_csv().encode('utf-8'),
+                                    file_name=f"{location}_minute.csv",
+                                    mime="text/csv"
+                                )
                                 
                                 
                                 if not df_hourly.empty:
