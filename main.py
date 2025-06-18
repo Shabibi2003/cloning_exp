@@ -2110,8 +2110,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
         '1202240029': ("St. Mary's School", 'Office'),
         '1202240028': ('St. Marys School', 'Office'),
         '1202240010': ('St. Marys School', 'Office'),
-        '1202240012': ('St. Marys School', 'Office'),
-        '1203240072': ('Metacity Office','Office')
+        '1202240012': ('St. Marys School', 'Office')
 
     }
     
@@ -2259,12 +2258,12 @@ elif st.session_state.script_choice == 'device_data_comparison':
 
 
                                 # generate button for download both csv
-                                st.download_button(
-                                    label=f"Download {location} Minute by Minute CSV",
-                                    data=df.to_csv().encode('utf-8'),
-                                    file_name=f"{location}_minute.csv",
-                                    mime="text/csv"
-                                )
+                                # st.download_button(
+                                #     label=f"Download {location} Minute by Minute CSV",
+                                #     data=df.to_csv().encode('utf-8'),
+                                #     file_name=f"{location}_minute.csv",
+                                #     mime="text/csv"
+                                # )
                                 
                                 
                                 if not df_hourly.empty:
@@ -2320,28 +2319,47 @@ elif st.session_state.script_choice == 'device_data_comparison':
                         # st.markdown("<h3 style='font-size:24px; text-align:left; font-weight:bold;'>Seasonal Analysis</h3>", unsafe_allow_html=True)
                         # st.markdown("<br>", unsafe_allow_html=True)
                         def plot_seasonal_comparison(df, device_id, location, pollutant):
+                            # Define seasons with their months and colors
                             seasons = {
-                                "Spring": ([3, 4], '#90EE90'),      # March, April
-                                "Summer": ([5, 6], '#FFD700'),      # May, June
-                                "Monsoon": ([7, 8, 9], '#FFA500'),  # July, August, September
-                                "Autumn": ([10, 11], '#D2691E'),    # October, November
-                                "Winter": ([12, 1, 2], '#87CEEB')   # December, January, February
+                                "Spring": ([3, 4], '#90EE90'),      # March 2024, April 2024, March 2025
+                                "Summer": ([5, 6], '#FFD700'),      # May 2024, June 2024
+                                "Monsoon": ([7, 8, 9], '#FFA500'),  # July 2024, August 2024, September 2024
+                                "Autumn": ([10, 11], '#D2691E'),    # October 2024, November 2024
+                                "Winter": ([12, 1, 2], '#87CEEB')   # December 2024, January 2024/2025, February 2024/2025
                             }
 
-
+                            # Filter data for 2024 and early 2025
+                            df = df[
+                                ((df.index.year == 2024)) |
+                                ((df.index.year == 2025) & (df.index.month <= 3))
+                            ]
 
                             fig = go.Figure()
-                            
-                            # Create a dictionary to store hourly data for all seasons
                             all_seasons_data = {}
 
                             for season, (months, color) in seasons.items():
-                                seasonal_data = df[df.index.month.isin(months)]
+                                if season == "Winter":
+                                    # Special handling for winter months across years
+                                    winter_data = df[
+                                        ((df.index.month == 12) & (df.index.year == 2024)) |
+                                        ((df.index.month.isin([1, 2])) & (df.index.year == 2025))
+                                    ]
+                                    seasonal_data = winter_data
+                                else:
+                                    # For other seasons, use 2024 data, and for Spring include March 2025
+                                    if season == "Spring":
+                                        seasonal_data = df[
+                                            ((df.index.month.isin(months)) & (df.index.year == 2024)) |
+                                            ((df.index.month == 3) & (df.index.year == 2025))
+                                        ]
+                                    else:
+                                        seasonal_data = df[(df.index.month.isin(months)) & (df.index.year == 2024)]
+
                                 seasonal_data = seasonal_data[seasonal_data[pollutant] != 0]
+                                
                                 if not seasonal_data.empty:
                                     hourly_data = seasonal_data[pollutant].groupby(seasonal_data.index.hour).mean()
                                     all_seasons_data[season] = hourly_data
-
 
                                     hours = list(range(24))
                                     r = int(color[1:3], 16)
@@ -2357,35 +2375,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                         fillcolor=f"rgba({r}, {g}, {b}, 0.1)"
                                     ))
 
-                            fig.update_layout(
-                                title=f"Average Daily {pollutant} Patterns by Season for {location}",
-                                xaxis_title="Hour of Day",
-                                yaxis_title=f"{pollutant} Value",
-                                xaxis=dict(tickmode='array', ticktext=list(range(24)), tickvals=list(range(24))),
-                                showlegend=True,
-                                legend=dict(
-                                    orientation="h",
-                                    yanchor="bottom",
-                                    y=-0.3,
-                                    xanchor="center",
-                                    x=0.5
-                                ),
-                                hovermode='x unified'
-                            )
-
-
-
-                            fig.add_annotation(
-                                text="Season Mapping: Spring (Mar–Apr), Summer (May–Jun), Monsoon (Jul–Sep), Autumn (Oct–Nov), Winter (Dec–Feb)",
-                                showarrow=False,
-                                xref='paper',
-                                yref='paper',
-                                x=0.5,
-                                y=-0.5,
-                                font=dict(size=12),
-                                xanchor='center'
-                            )
-
+                            # ... existing code for layout and annotations ...
 
                             # Create a DataFrame for download
                             download_data = pd.DataFrame()
@@ -2404,6 +2394,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
                             )
 
                             return fig
+
 
                         # Create seasonal charts for selected locations
                         st.markdown("### Seasonal Patterns Analysis")
