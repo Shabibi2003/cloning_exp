@@ -2110,7 +2110,8 @@ elif st.session_state.script_choice == 'device_data_comparison':
         '1202240029': ("St. Mary's School", 'Office'),
         '1202240028': ('St. Marys School', 'Office'),
         '1202240010': ('St. Marys School', 'Office'),
-        '1202240012': ('St. Marys School', 'Office')
+        '1202240012': ('St. Marys School', 'Office'),
+        '1203240072': ('Metacity Office','Office')
 
     }
     
@@ -2258,12 +2259,12 @@ elif st.session_state.script_choice == 'device_data_comparison':
 
 
                                 # generate button for download both csv
-                                # st.download_button(
-                                #     label=f"Download {location} Minute by Minute CSV",
-                                #     data=df.to_csv().encode('utf-8'),
-                                #     file_name=f"{location}_minute.csv",
-                                #     mime="text/csv"
-                                # )
+                                st.download_button(
+                                    label=f"Download {location} Minute by Minute CSV",
+                                    data=df.to_csv().encode('utf-8'),
+                                    file_name=f"{location}_minute.csv",
+                                    mime="text/csv"
+                                )
                                 
                                 
                                 if not df_hourly.empty:
@@ -2318,31 +2319,35 @@ elif st.session_state.script_choice == 'device_data_comparison':
                         # Add seasonal chart section
                         # st.markdown("<h3 style='font-size:24px; text-align:left; font-weight:bold;'>Seasonal Analysis</h3>", unsafe_allow_html=True)
                         # st.markdown("<br>", unsafe_allow_html=True)
-
                         def plot_seasonal_comparison(df, device_id, location, pollutant):
-
                             seasons = {
-                                "Spring": ([3, 4], '#90EE90'),  # Light green
-                                "Summer": ([5, 6], '#FFD700'),  # Gold
-                                'Monsoon': ([7, 8,9], '#FFA500'),  # Orange
-                                "Autumn": ([9, 10], '#D2691E'),  # Chocolate
-                                "Winter": ([12, 1, 2], '#87CEEB')   # Sky blue
+                                "Spring": ([3, 4], '#90EE90'),      # March, April
+                                "Summer": ([5, 6], '#FFD700'),      # May, June
+                                "Monsoon": ([7, 8, 9], '#FFA500'),  # July, August, September
+                                "Autumn": ([10, 11], '#D2691E'),    # October, November
+                                "Winter": ([12, 1, 2], '#87CEEB')   # December, January, February
                             }
-                            
+
+
+
                             fig = go.Figure()
                             
+                            # Create a dictionary to store hourly data for all seasons
+                            all_seasons_data = {}
+
                             for season, (months, color) in seasons.items():
                                 seasonal_data = df[df.index.month.isin(months)]
+                                seasonal_data = seasonal_data[seasonal_data[pollutant] != 0]
                                 if not seasonal_data.empty:
-                                    # Calculate hourly averages for the season
-                                    hourly_data = seasonal_data.groupby([seasonal_data.index.hour])[pollutant].mean()
+                                    hourly_data = seasonal_data[pollutant].groupby(seasonal_data.index.hour).mean()
+                                    all_seasons_data[season] = hourly_data
+
+
                                     hours = list(range(24))
-                                    
-                                    # Convert hex to RGB for fillcolor
                                     r = int(color[1:3], 16)
                                     g = int(color[3:5], 16)
                                     b = int(color[5:7], 16)
-                                    
+
                                     fig.add_trace(go.Scatter(
                                         x=hours,
                                         y=[hourly_data.get(hour, None) for hour in hours],
@@ -2351,8 +2356,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                         fill='tonexty',
                                         fillcolor=f"rgba({r}, {g}, {b}, 0.1)"
                                     ))
-                            
-                            # Rest of the layout code remains the same
+
                             fig.update_layout(
                                 title=f"Average Daily {pollutant} Patterns by Season for {location}",
                                 xaxis_title="Hour of Day",
@@ -2368,8 +2372,11 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                 ),
                                 hovermode='x unified'
                             )
+
+
+
                             fig.add_annotation(
-                                text="Season Mapping: Spring (Mar–Apr), Summer (May–Jun), Monsoon (Jul–Sep), Autumn (Sep–Oct), Winter (Dec–Feb)",
+                                text="Season Mapping: Spring (Mar–Apr), Summer (May–Jun), Monsoon (Jul–Sep), Autumn (Oct–Nov), Winter (Dec–Feb)",
                                 showarrow=False,
                                 xref='paper',
                                 yref='paper',
@@ -2379,7 +2386,23 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                 xanchor='center'
                             )
 
+
+                            # Create a DataFrame for download
+                            download_data = pd.DataFrame()
+                            for season in all_seasons_data:
+                                download_data[season] = [all_seasons_data[season].get(hour, None) for hour in range(24)]
+                            download_data.index = range(24)
+                            download_data.index.name = 'Hour'
                             
+                            # Add download button using streamlit
+                            csv = download_data.to_csv()
+                            st.download_button(
+                                label=f"Download {location} Hourly Data",
+                                data=csv,
+                                file_name=f"{location}_{pollutant}_seasonal_hourly_data.csv",
+                                mime='text/csv',
+                            )
+
                             return fig
 
                         # Create seasonal charts for selected locations
@@ -2499,5 +2522,4 @@ st.markdown(
     """, unsafe_allow_html=True
 )
 st.markdown("<br>", unsafe_allow_html=True)
-
 
