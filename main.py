@@ -2108,9 +2108,9 @@ elif st.session_state.script_choice == 'device_data_comparison':
         '1201240073': ('Tanmay Tathagat', 'Residential'),
         '1203240082': ('Gurneet Prabhansh Room', 'Residential'),
         '1202240029': ("St. Mary's School", 'Office'),
-        '1202240028': ('St. Mary's School', 'Office'),
-        '1202240010': ('St. Mary's School', 'Office'),
-        '1202240012': ('St. Mary's School', 'Office')
+        '1202240028': ("St. Mary's School", 'Office'),
+        '1202240010': ("St. Mary's School", 'Office'),
+        '1202240012': ("St. Mary's School", 'Office')
 
     }
     
