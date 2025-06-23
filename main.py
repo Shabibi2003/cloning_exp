@@ -1452,10 +1452,10 @@ if st.session_state.script_choice == "monthly_trends":
         "1201240074": ("F-5, 318-N, Chirag Delhi, Delhi-110017", "Residential","Abhishek Living Room"),
         "1203240077": ("B-2/51-A, Keshav Puram", "Apartment","Gurneet Mannat Room"),
         "1203240082": ("B-2/51-A, Keshav Puram", "Apartment","Gurneet Prabhansh Room"),
-        "1202240029": ("St. Mary's School, Dwarka Sec-19", "Office","St. Mary's School"),
-        "1202240028": ("St. Mary's School, Dwarka Sec-19", "Office","St. Mary's School"),
-        "1202240010": ("St. Mary's School, Dwarka Sec-19", "Office","St. Mary's School"),
-        "1202240012": ("St. Mary's School, Dwarka Sec-19", "School","St. Mary's School"),
+        "1202240029": ("St. Mary's School, Dwarka Sec-19", "Office","St. Mary's School - Classroom (XII- C)"),
+        "1202240028": ("St. Mary's School, Dwarka Sec-19", "Office","St. Mary's School - Sr. Library"),
+        "1202240010": ("St. Mary's School, Dwarka Sec-19", "Office","St. Mary's School - Middle Computer Lab"),
+        "1202240012": ("St. Mary's School, Dwarka Sec-19", "School","St. Mary's School - Chemistry Lab "),
     }
 
     residential_ids = [
@@ -2107,10 +2107,10 @@ elif st.session_state.script_choice == 'device_data_comparison':
         '1203240074': ('Ashish Living Room', 'Residential'),
         '1201240073': ('Tanmay Tathagat', 'Residential'),
         '1203240082': ('Gurneet Prabhansh Room', 'Residential'),
-        '1202240029': ("St. Mary's School", 'Office'),
-        '1202240028': ("St. Mary's School", 'Office'),
-        '1202240010': ("St. Mary's School", 'Office'),
-        '1202240012': ("St. Mary's School", 'Office')
+        '1202240029': ("St. Mary's School", 'Classroom'),
+        '1202240028': ("St. Mary's School", 'Sr. Library'),
+        '1202240010': ("St. Mary's School", 'Computer Lab'),
+        '1202240012': ("St. Mary's School", 'Chemistry Lab')
 
     }
     
