@@ -2399,7 +2399,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
                         # Create seasonal charts for selected locations
                         st.markdown("### Seasonal Patterns Analysis")
                         st.write("24-hour average patterns for each season, showing how values vary throughout the day.")
-                        st.write(f"Seasonal data for deviceID: {location}")
+                        st.write(f"Seasonal data of: {location}")
                         
                         for device_id, color, location in device_colors:
                             if location in processed_locations:
