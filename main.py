@@ -2401,7 +2401,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
                         st.write("24-hour average patterns for each season, showing how values vary throughout the day.")
                         
                         for device_id, color, location in device_colors:
-                            st.write(f"Seasonal data of: {location}")
+                            st.write(f"Average Daily {pollutants} Patterns by Season for {location}")
                             if location in processed_locations:
                                 # Query all available data for the device
                                 query = """
