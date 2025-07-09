@@ -1452,10 +1452,10 @@ if st.session_state.script_choice == "monthly_trends":
         "1201240074": ("F-5, 318-N, Chirag Delhi, Delhi-110017", "Residential","Abhishek Living Room"),
         "1203240077": ("B-2/51-A, Keshav Puram", "Apartment","Gurneet Mannat Room"),
         "1203240082": ("B-2/51-A, Keshav Puram", "Apartment","Gurneet Prabhansh Room"),
-        "1202240029": ("St. Mary's School, Dwarka Sec-19", "Office","St. Mary's School"),
-        "1202240028": ("St. Mary's School, Dwarka Sec-19", "Office","St. Mary's School"),
-        "1202240010": ("St. Mary's School, Dwarka Sec-19", "Office","St. Mary's School"),
-        "1202240012": ("St. Mary's School, Dwarka Sec-19", "School","St. Mary's School"),
+        "1202240029": ("St. Mary's School, Dwarka Sec-19", "Office","St. Mary's School - Classroom (XII- C)"),
+        "1202240028": ("St. Mary's School, Dwarka Sec-19", "Office","St. Mary's School - Sr. Library"),
+        "1202240010": ("St. Mary's School, Dwarka Sec-19", "Office","St. Mary's School - Middle Computer Lab"),
+        "1202240012": ("St. Mary's School, Dwarka Sec-19", "School","St. Mary's School - Chemistry Lab "),
     }
 
     residential_ids = [
@@ -2107,10 +2107,10 @@ elif st.session_state.script_choice == 'device_data_comparison':
         '1203240074': ('Ashish Living Room', 'Residential'),
         '1201240073': ('Tanmay Tathagat', 'Residential'),
         '1203240082': ('Gurneet Prabhansh Room', 'Residential'),
-        '1202240029': ("St. Mary's School", 'Office'),
-        '1202240028': ('St. Marys School', 'Office'),
-        '1202240010': ('St. Marys School', 'Office'),
-        '1202240012': ('St. Marys School', 'Office')
+        '1202240029': ("St. Mary's School", 'Classroom'),
+        '1202240028': ("St. Mary's School", 'Sr. Library'),
+        '1202240010': ("St. Mary's School", 'Computer Lab'),
+        '1202240012': ("St. Mary's School", 'Chemistry Lab')
 
     }
     
@@ -2318,31 +2318,54 @@ elif st.session_state.script_choice == 'device_data_comparison':
                         # Add seasonal chart section
                         # st.markdown("<h3 style='font-size:24px; text-align:left; font-weight:bold;'>Seasonal Analysis</h3>", unsafe_allow_html=True)
                         # st.markdown("<br>", unsafe_allow_html=True)
-
                         def plot_seasonal_comparison(df, device_id, location, pollutant):
-
+                            # Define seasons with their months and colors
                             seasons = {
-                                "Spring": ([3, 4], '#90EE90'),  # Light green
-                                "Summer": ([5, 6], '#FFD700'),  # Gold
-                                'Monsoon': ([7, 8,9], '#FFA500'),  # Orange
-                                "Autumn": ([9, 10], '#D2691E'),  # Chocolate
-                                "Winter": ([12, 1, 2], '#87CEEB')   # Sky blue
+                                "Spring": ([3, 4], '#90EE90'),      # March 2024, April 2024, March 2025
+                                "Summer": ([5, 6], '#FFD700'),      # May 2024, June 2024
+                                "Monsoon": ([7, 8, 9], '#FFA500'),  # July 2024, August 2024, September 2024
+                                "Autumn": ([10, 11], '#D2691E'),    # October 2024, November 2024
+                                "Winter": ([12, 1, 2], '#87CEEB')   # December 2024, January 2024/2025, February 2024/2025
                             }
-                            
+
+                            # Filter data for 2024 and early 2025
+                            df = df[
+                                ((df.index.year == 2024)) |
+                                ((df.index.year == 2025) & (df.index.month <= 3))
+                            ]
+
                             fig = go.Figure()
-                            
+                            all_seasons_data = {}
+
                             for season, (months, color) in seasons.items():
-                                seasonal_data = df[df.index.month.isin(months)]
+                                if season == "Winter":
+                                    # Special handling for winter months across years
+                                    winter_data = df[
+                                        ((df.index.month == 12) & (df.index.year == 2024)) |
+                                        ((df.index.month.isin([1, 2])) & (df.index.year == 2025))
+                                    ]
+                                    seasonal_data = winter_data
+                                else:
+                                    # For other seasons, use 2024 data, and for Spring include March 2025
+                                    if season == "Spring":
+                                        seasonal_data = df[
+                                            ((df.index.month.isin(months)) & (df.index.year == 2024)) |
+                                            ((df.index.month == 3) & (df.index.year == 2025))
+                                        ]
+                                    else:
+                                        seasonal_data = df[(df.index.month.isin(months)) & (df.index.year == 2024)]
+
+                                seasonal_data = seasonal_data[seasonal_data[pollutant] != 0]
+                                
                                 if not seasonal_data.empty:
-                                    # Calculate hourly averages for the season
-                                    hourly_data = seasonal_data.groupby([seasonal_data.index.hour])[pollutant].mean()
+                                    hourly_data = seasonal_data[pollutant].groupby(seasonal_data.index.hour).mean()
+                                    all_seasons_data[season] = hourly_data
+
                                     hours = list(range(24))
-                                    
-                                    # Convert hex to RGB for fillcolor
                                     r = int(color[1:3], 16)
                                     g = int(color[3:5], 16)
                                     b = int(color[5:7], 16)
-                                    
+
                                     fig.add_trace(go.Scatter(
                                         x=hours,
                                         y=[hourly_data.get(hour, None) for hour in hours],
@@ -2351,42 +2374,34 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                         fill='tonexty',
                                         fillcolor=f"rgba({r}, {g}, {b}, 0.1)"
                                     ))
-                            
-                            # Rest of the layout code remains the same
-                            fig.update_layout(
-                                title=f"Average Daily {pollutant} Patterns by Season for {location}",
-                                xaxis_title="Hour of Day",
-                                yaxis_title=f"{pollutant} Value",
-                                xaxis=dict(tickmode='array', ticktext=list(range(24)), tickvals=list(range(24))),
-                                showlegend=True,
-                                legend=dict(
-                                    orientation="h",
-                                    yanchor="bottom",
-                                    y=-0.3,
-                                    xanchor="center",
-                                    x=0.5
-                                ),
-                                hovermode='x unified'
-                            )
-                            fig.add_annotation(
-                                text="Season Mapping: Spring (Mar–Apr), Summer (May–Jun), Monsoon (Jul–Sep), Autumn (Sep–Oct), Winter (Dec–Feb)",
-                                showarrow=False,
-                                xref='paper',
-                                yref='paper',
-                                x=0.5,
-                                y=-0.5,
-                                font=dict(size=12),
-                                xanchor='center'
-                            )
 
+                            # ... existing code for layout and annotations ...
+
+                            # # Create a DataFrame for download
+                            # download_data = pd.DataFrame()
+                            # for season in all_seasons_data:
+                            #     download_data[season] = [all_seasons_data[season].get(hour, None) for hour in range(24)]
+                            # download_data.index = range(24)
+                            # download_data.index.name = 'Hour'
                             
+                            # # Add download button using streamlit
+                            # csv = download_data.to_csv()
+                            # st.download_button(
+                            #     label=f"Download {location} Hourly Data",
+                            #     data=csv,
+                            #     file_name=f"{location}_{pollutant}_seasonal_hourly_data.csv",
+                            #     mime='text/csv',
+                            # )
+
                             return fig
+
 
                         # Create seasonal charts for selected locations
                         st.markdown("### Seasonal Patterns Analysis")
                         st.write("24-hour average patterns for each season, showing how values vary throughout the day.")
                         
                         for device_id, color, location in device_colors:
+                            st.write(f"Seasonal data of: {location}")
                             if location in processed_locations:
                                 # Query all available data for the device
                                 query = """
@@ -2422,6 +2437,9 @@ elif st.session_state.script_choice == 'device_data_comparison':
                     if 'conn' in locals() and conn.is_connected():
                         cursor.close()
                         conn.close()
+        st.cache_data.clear()
+
+        
     
     st.markdown('<hr style="border:1px solid black">', unsafe_allow_html=True)
 
