@@ -2338,6 +2338,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
                             all_seasons_data = {}
 
                             for season, (months, color) in seasons.items():
+                                st.write(f"Seasonal data for deviceID: {device_id}")
                                 if season == "Winter":
                                     # Special handling for winter months across years
                                     winter_data = df[
