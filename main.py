@@ -2438,8 +2438,6 @@ elif st.session_state.script_choice == 'device_data_comparison':
                         cursor.close()
                         conn.close()
         st.cache_data.clear()
-
-        
     
     st.markdown('<hr style="border:1px solid black">', unsafe_allow_html=True)
 
