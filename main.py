@@ -2338,7 +2338,6 @@ elif st.session_state.script_choice == 'device_data_comparison':
                             all_seasons_data = {}
 
                             for season, (months, color) in seasons.items():
-                                st.write(f"Seasonal data for deviceID: {device_id}")
                                 if season == "Winter":
                                     # Special handling for winter months across years
                                     winter_data = df[
@@ -2400,7 +2399,7 @@ elif st.session_state.script_choice == 'device_data_comparison':
                         # Create seasonal charts for selected locations
                         st.markdown("### Seasonal Patterns Analysis")
                         st.write("24-hour average patterns for each season, showing how values vary throughout the day.")
-                        
+                        st.write(f"Seasonal data for deviceID: {device_id}")
                         for device_id, color, location in device_colors:
                             if location in processed_locations:
                                 # Query all available data for the device
