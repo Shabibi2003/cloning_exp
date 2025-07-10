@@ -2411,7 +2411,6 @@ elif st.session_state.script_choice == 'device_data_comparison':
                         
 
                         for device_id, color, location in device_colors:
-                            st.write(f"Average Daily {pollutant} Patterns by Season for {location}")
                             if location in processed_locations:
                                 # Query all available data for the device
                                 query = """
