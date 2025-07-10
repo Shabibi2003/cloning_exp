@@ -2374,6 +2374,15 @@ elif st.session_state.script_choice == 'device_data_comparison':
                                         fill='tonexty',
                                         fillcolor=f"rgba({r}, {g}, {b}, 0.1)"
                                     ))
+                                    
+                                    fig.update_layout(
+                                    title=f"Indoor {pollutant} Seasonal Patterns - {location}",
+                                    xaxis_title="Hour of Day",
+                                    yaxis_title=f"{pollutant} Value",
+                                    hovermode='x unified'
+                                    )
+
+                            
 
                             # ... existing code for layout and annotations ...
 
