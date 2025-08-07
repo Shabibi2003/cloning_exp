@@ -2387,20 +2387,20 @@ elif st.session_state.script_choice == 'device_data_comparison':
                             # ... existing code for layout and annotations ...
 
                             # # Create a DataFrame for download
-                            # download_data = pd.DataFrame()
-                            # for season in all_seasons_data:
-                            #     download_data[season] = [all_seasons_data[season].get(hour, None) for hour in range(24)]
-                            # download_data.index = range(24)
-                            # download_data.index.name = 'Hour'
+                            download_data = pd.DataFrame()
+                            for season in all_seasons_data:
+                                download_data[season] = [all_seasons_data[season].get(hour, None) for hour in range(24)]
+                            download_data.index = range(24)
+                            download_data.index.name = 'Hour'
                             
-                            # # Add download button using streamlit
-                            # csv = download_data.to_csv()
-                            # st.download_button(
-                            #     label=f"Download {location} Hourly Data",
-                            #     data=csv,
-                            #     file_name=f"{location}_{pollutant}_seasonal_hourly_data.csv",
-                            #     mime='text/csv',
-                            # )
+                            # Add download button using streamlit
+                            csv = download_data.to_csv()
+                            st.download_button(
+                                label=f"Download {location} Hourly Data",
+                                data=csv,
+                                file_name=f"{location}_{pollutant}_seasonal_hourly_data.csv",
+                                mime='text/csv',
+                            )
 
                             return fig
 
@@ -2524,5 +2524,6 @@ st.markdown(
     """, unsafe_allow_html=True
 )
 st.markdown("<br>", unsafe_allow_html=True)
+
 
 
